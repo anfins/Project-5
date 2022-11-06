@@ -16,3 +16,6 @@ graph.o: graph.cpp
 	
 vertex.o: vertex.cpp
 	g++ $(CPPOPTIONS) -c vertex.cpp
+
+clean:
+	rm ./test *.o
