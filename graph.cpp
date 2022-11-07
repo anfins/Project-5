@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include "vertex.cpp"
+#include <queue>
 
 using namespace std;
 
@@ -12,8 +13,10 @@ template <typename D, typename K>
 class Graph
 {
 	private:
-    		Vertex<D, K>* *vertices;	// array of vertex pointers
-    		int num_of_vertices;	// size of array
+
+			Vertex<D, K>* *vertices;	// array of vertex pointers
+			int num_of_vertices;	// size of array
+
 
     	public:
         	Graph(vector<K> keys, vector<D> data, vector< vector<K> > edges)	// constructor for given keys, data, and adjacency lists of vertices
@@ -26,7 +29,7 @@ class Graph
         			num_of_vertices = 0;
         			return;
         		}
-        		
+
         		// allocate space for vertex pointers
 		    	num_of_vertices = keys.size();
 		    	vertices = new Vertex<D,K>*[num_of_vertices];
@@ -35,49 +38,49 @@ class Graph
 		    	for (int i = 0; i < num_of_vertices; i++)
 		    	{
 		        	Vertex<D, K>* new_vertex = new Vertex<D, K>(keys[i], data[i], edges[i].size()); //create a new vertex, adjacency list will be created later
-		        
-		        	vertices[i] = new_vertex; //add the vertex to the graph's list of the vertices 
+
+		        	vertices[i] = new_vertex; //add the vertex to the graph's list of the vertices
 		    	}
-		    
+
 		    	// this for loop initializes all vertex adjacency lists
 		    	for (int j = 0; j < num_of_vertices; j++)
-		    	{		    	
+		    	{
 		    		int num_edges_at_vertex = edges[j].size();	// number of edges (adjacent vertices)
-		    		
+
 		    		for (int k = 0; k < num_edges_at_vertex; k++)
 		    		{
 		    			Vertex<D, K>* adj_vertex = this->get(edges[j][k]);	// get a pointer to the adjacent vertex
-		    			
+
 		    			vertices[j]->adj_list[k] = adj_vertex;	// add it to adjacency list
 		    		}
 		    	}
         	};
-        
+
 		~Graph()	// destructor
 		{
 			for (int i = 0; i < num_of_vertices; i++)	// deletes every vertex's adjacency list and the vertex itself
 			{
 				delete vertices[i]->adj_list;
 				delete vertices[i];
-			}	
+			}
 
 		    	delete vertices;	// then, deletes the vertices array
 		};
-        
+
         	/*
         	get function.
-        	
+
         	Purpose:
         	Find the vertex with a given key in a graph.
         	Returns a pointer to the vertex. Returns NULL
         	if key does not exist.
-        	
+
         	Parameters:
         	- k: a key.
-        	
+
         	Pre-conditions:
         	- A graph.
-        	
+
         	Post-conditions:
         	- A graph.
         	*/
@@ -88,47 +91,84 @@ class Graph
 				if (vertices[i]->key == k)	// if keys match, return pointer to vertex
 					return vertices[i];
 			}
-			
+
 			return NULL;	// if no match, return NULL
 		};
-		
+
 		/*
 		to_string function.
-		
+
 		Purpose:
 		Print the keys, data, and adjacency lists of all
 		vertices in a graph.
 		*/
+
+
+		void bfs(K s){
+			for(int i = 0; i < num_of_vertices; i++){ //initializing every vertex in the graph to their default values
+					vertices[i]->color = 0;
+					vertices[i]->predecessor = NULL;
+					vertices[i]->distance = 1000000000; //change to infinity later on
+
+			}
+			Vertex <D,K> * source = this->get(s);
+			if(source == NULL){//just incase the requested key is not in the graph
+				return;
+			}
+			source->distance = 0; //initializing the source vertex's distance to 0
+
+			queue <Vertex <D,K> *> q; //making a queue to store our Vertex pointers
+			q.push(source);
+			while(q.empty() != true){ //while the queue is not empty there are still vertices that need to be checked
+				Vertex <D,K> * current;
+				current = q.front(); //sets a placeholder vertex = to what is at the front of the queue for future reference
+				q.pop();
+				for(int p = 0; p < current->num_of_edges; p++){ //will discover every undiscovered node from current's adjacency list and add them to the queue
+
+
+					Vertex <D,K>* newVertex = current->adj_list[p];
+					if(newVertex->color == 0){
+						q.push(newVertex);
+						newVertex->predecessor = current;
+						newVertex->distance = newVertex->predecessor->distance +1;
+					}
+				}
+				current->color = 1;
+			}
+
+
+
+		}
 		string to_string() const
 		{
 			stringstream ss;
-			
+
 			if (num_of_vertices <= 0)
 				return ss.str();
-				
+
 			for (int i = 0; i < num_of_vertices; i++)
 			{
 				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
-				
+
 				if (vertices[i]->num_of_edges > 0)
 				{
 					for (int j = 0; j < ((vertices[i]->num_of_edges) - 1); j++)
 						ss << vertices[i]->adj_list[j]->key << ", ";
-						
+
 					ss << vertices[i]->adj_list[((vertices[i]->num_of_edges) - 1)]->key << "}";
-					
+
 					if (i != (num_of_vertices - 1))
 						ss << endl;
 				}
 				else
 				{
 					ss << "}";
-					
+
 					if (i != (num_of_vertices - 1))
 						ss << endl;
 				}
 			}
-			
+
 			return ss.str();
 		};
 };
