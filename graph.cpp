@@ -95,16 +95,30 @@ class Graph
 			return NULL;	// if no match, return NULL
 		};
 
-		/*
-		to_string function.
 
-		Purpose:
-		Print the keys, data, and adjacency lists of all
-		vertices in a graph.
-		*/
-
-
+		bool reachable(K u, K v){
+			Graph <D,K>  *copy = this;
+			copy->bfs(u);
+			Vertex <D,K> * endVert = copy->get(v);
+			if(endVert == NULL){ //if the vertex with key v is not in the bfs tree of u return false
+				return false;
+			}
+			else{
+				int finDist = endVert->distance;
+				if(finDist == 1000000000){
+					return false;
+				}
+				cout << finDist << endl;
+				return true;
+			}
+		}
 		void bfs(K s){
+			/*
+			ADD DESCRIPTIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+
+
+			*/
+
 			for(int i = 0; i < num_of_vertices; i++){ //initializing every vertex in the graph to their default values
 					vertices[i]->color = 0;
 					vertices[i]->predecessor = NULL;
@@ -140,6 +154,14 @@ class Graph
 
 		}
 		string to_string() const
+
+				/*
+				to_string function.
+
+				Purpose:
+				Print the keys, data, and adjacency lists of all
+				vertices in a graph.
+				*/
 		{
 			stringstream ss;
 
