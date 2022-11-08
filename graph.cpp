@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include "vertex.cpp"
+#include <bits/stdc++.h>
 #include <queue>
 
 using namespace std;
@@ -12,12 +13,6 @@ using namespace std;
 template <typename D, typename K>
 class Graph
 {
-	private:
-
-			Vertex<D, K>* *vertices;	// array of vertex pointers
-			int num_of_vertices;	// size of array
-
-
     	public:
         	Graph(vector<K> keys, vector<D> data, vector< vector<K> > edges)	// constructor for given keys, data, and adjacency lists of vertices
         	{
@@ -54,6 +49,8 @@ class Graph
 		    			vertices[j]->adj_list[k] = adj_vertex;	// add it to adjacency list
 		    		}
 		    	}
+		    	
+		    	source = K();
         	};
 
 		~Graph()	// destructor
@@ -84,7 +81,7 @@ class Graph
         	Post-conditions:
         	- A graph.
         	*/
-		Vertex<D, K>* get(K k)	// returns pointer to vertex with matching key
+		Vertex<D, K>* get(K k)	const // returns pointer to vertex with matching key
 		{
 			for (int i = 0; i < num_of_vertices; i++)	// go through all vertices
 			{
@@ -96,102 +93,259 @@ class Graph
 		};
 
 
-		bool reachable(K u, K v){
-			Graph <D,K>  *copy = this;
-			copy->bfs(u);
-			Vertex <D,K> * endVert = copy->get(v); // finds the location of v in the graph 
-			if(endVert == NULL){ //if the vertex with key v is not in the bfs tree of u return false
-				return false;
-			}
-			else{
-				int finDist = endVert->distance;
-				if(finDist == 1000000000){ // if the distance is still very high, it means that the node was never discovered and hence not initialized during the running of bfs
-					return false;
-				}
-				cout << finDist << endl;
-				
-				return true;
-			}
-		}
-		void bfs(K s){
-			/*
-			ADD DESCRIPTIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-
-
-			*/
-
-			for(int i = 0; i < num_of_vertices; i++){ //initializing every vertex in the graph to their default values
+		void bfs(K s)
+		{
+			//initializing every vertex in the graph to their default values
+			for(int i = 0; i < num_of_vertices; i++)
+			{ 
 					vertices[i]->color = 0;
 					vertices[i]->predecessor = NULL;
-					vertices[i]->distance = 1000000000; //change to infinity later on
+					vertices[i]->distance =INT_MAX; //change to infinity later on
 
 			}
 			Vertex <D,K> * source = this->get(s);
-			if(source == NULL){//just incase the requested key is not in the graph
+			
+			if(source == NULL)	// incase the requested key is not in the graph
+			{
 				return;
 			}
-			source->distance = 0; //initializing the source vertex's distance to 0
+			
+			// initialize source attributes
+			source->color = 1;
+			source->predecessor = NULL;
+			source->distance = 0;
+			
+			this->source = source->key;
 
 			queue <Vertex <D,K> *> q; //making a queue to store our Vertex pointers
 			q.push(source);
-			while(q.empty() != true){ //while the queue is not empty there are still vertices that need to be checked
+			
+			//while the queue is not empty there are still vertices that need to be checked
+			while(q.empty() != true)
+			{
 				Vertex <D,K> * current;
 				current = q.front(); //sets a placeholder vertex = to what is at the front of the queue for future reference
 				q.pop();
-				for(int p = 0; p < current->num_of_edges; p++){ //will discover every undiscovered node from current's adjacency list and add them to the queue
+				
+				//will discover every undiscovered node from current's adjacency list and add them to the queue
+				for(int p = 0; p < current->num_of_edges; p++)
+				{ 
 
 
 					Vertex <D,K>* newVertex = current->adj_list[p];
-					if(newVertex->color == 0){
+					
+					if(newVertex->color == 0)
+					{
 						q.push(newVertex);
 						newVertex->predecessor = current;
 						newVertex->distance = newVertex->predecessor->distance +1;
 					}
 				}
+				
 				current->color = 1;
 			}
-
-
-
 		}
-		string to_string() const
-
-				/*
-				to_string function.
-
-				Purpose:
-				Print the keys, data, and adjacency lists of all
-				vertices in a graph.
-				*/
+		
+		/*void bfs_tree(K s)
 		{
-			stringstream ss;
-
-			if (num_of_vertices <= 0)
-				return ss.str();
-
+			K original_source = this->source;
+			
+			this->bfs(s);
+			Vertex<D, K>* source = this->get(s);
+			
+			cout << source->key << endl;
+			
 			for (int i = 0; i < num_of_vertices; i++)
 			{
-				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
+				if()
+			
+			}
+			
+			cout << endl;
+		
+		
+			this->bfs(original_source);
+		}*/
+		
+			/*
+			Vertex<D, K>* source = this->get(u);
+			Vertex<D, K>* find = this->get(v);
+			
+			if (source == NULL || find == NULL)
+			{
+				cerr << "No path exists, one or more input keys are invalid." << endl;
+				return;
+			}
+			
+			if (source->key == find->key)
+				cout << source->key;
+			else if (find->predecessor == NULL)
+				cout << "No path exists.";
+			else
+			{
+				this->print_path(source->key, find->predecessor->key);
+				cout << " -> " << find->key;
+			}
+			*/
 
+		bool reachable(K u, K v)
+		{
+			K s = this->getSource();
+			Graph <D,K> * copy = this;
+			copy->bfs(u);
+			Vertex <D,K> * endVert = copy->get(v);
+			this->setSource(s);
+			if(endVert == NULL)
+			{ //if the vertex with key v is not in the bfs tree of u return false
+				return false;
+			}
+			else
+			{
+				
+				int finDist = endVert->distance;
+				
+				if(finDist == INT_MAX)
+				{
+					return false;
+				}
+				
+
+				return true;
+			}
+			
+		}
+		
+		void setSource(K k){
+			source = k;
+		
+		
+		}
+		
+		K getSource(){
+			return source;
+		}
+		
+		/*
+		to_string function.
+		
+		Purpose:
+		Print the keys, data, and adjacency lists of all
+		vertices in a graph.
+		*/
+		string to_string() const
+		{
+			stringstream ss;
+			
+			if (num_of_vertices <= 0)
+				return ss.str();
+			
+			if (num_of_vertices <= 0)
+				return ss.str();
+				
+			ss << "~~~~~~~~~~" << endl;
+			
+			ss << "ADJACENCY LISTS: " << endl;
+			ss << this->print_adjacency_lists() << endl;
+			
+			ss << "~~~~~" << endl;
+			
+			if (source != K())
+				ss << "VERTEX ATTRIBUTES (source is Vertex " << source << "): " << endl;
+			else
+				ss << "VERTEX ATTRIBUTES (no source): " << endl;
+			
+			ss << this->print_vertex_attributes() << endl;
+			
+			ss << "~~~~~~~~~~";
+			
+			return ss.str();
+		};
+		
+	private:
+		Vertex<D, K>* *vertices;	// array of vertex pointers
+		int num_of_vertices;	// size of array
+		K source;	// key of source vertex for bfs
+		
+		/*
+		print_adjacency_lists function.
+		
+		Purpose:
+		Print the adjacency lists of all
+		vertices in a graph.
+		*/
+		string print_adjacency_lists() const
+		{
+			stringstream ss;
+				
+			for (int i = 0; i < num_of_vertices; i++)
+			{		 
+				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
 				if (vertices[i]->num_of_edges > 0)
 				{
 					for (int j = 0; j < ((vertices[i]->num_of_edges) - 1); j++)
 						ss << vertices[i]->adj_list[j]->key << ", ";
-
+						
 					ss << vertices[i]->adj_list[((vertices[i]->num_of_edges) - 1)]->key << "}";
-
+					
 					if (i != (num_of_vertices - 1))
 						ss << endl;
 				}
 				else
 				{
 					ss << "}";
-
+					
 					if (i != (num_of_vertices - 1))
 						ss << endl;
 				}
 			}
-
+			
+			return ss.str();
+		};
+		
+		
+		
+		
+		
+		/*
+		print_vertex_attributes function.
+		
+		Purpose:
+		Print the attributes of each vertex 
+		in a graph.
+		*/
+		string print_vertex_attributes() const
+		{
+			stringstream ss;
+				
+			for (int i = 0; i < num_of_vertices; i++)
+			{
+				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
+				
+				// color
+				if (vertices[i]->color)
+					ss << "color = Black, ";
+				else
+					ss << "color = White, ";
+					
+				// predecessor
+				if (vertices[i]->predecessor == NULL)
+					ss << "π = None, ";
+				else
+					ss << "π = " << vertices[i]->predecessor->key << ", ";
+					
+				// distance
+				if(vertices[i]->distance == INT_MAX)
+					ss << "distance = ∞";
+				else
+					ss << "distance = " << vertices[i]->distance;
+					
+				// end of a vertex
+				if (i != (num_of_vertices - 1))
+					ss << "}" << endl;
+				else
+					ss << "}";
+			}
+			
 			return ss.str();
 		};
 };
