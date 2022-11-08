@@ -99,16 +99,17 @@ class Graph
 		bool reachable(K u, K v){
 			Graph <D,K>  *copy = this;
 			copy->bfs(u);
-			Vertex <D,K> * endVert = copy->get(v);
+			Vertex <D,K> * endVert = copy->get(v); // finds the location of v in the graph 
 			if(endVert == NULL){ //if the vertex with key v is not in the bfs tree of u return false
 				return false;
 			}
 			else{
 				int finDist = endVert->distance;
-				if(finDist == 1000000000){
+				if(finDist == 1000000000){ // if the distance is still very high, it means that the node was never discovered and hence not initialized during the running of bfs
 					return false;
 				}
 				cout << finDist << endl;
+				
 				return true;
 			}
 		}
