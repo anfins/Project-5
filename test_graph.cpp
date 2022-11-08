@@ -60,7 +60,21 @@ void test_bfs(Graph<string,string>* G) {
         cerr << "Error testing bfs : " << e.what() << endl;
     }
 }
-
+void test_reachable(Graph<string,string>* G) {
+    try {
+        if(!G->reachable("R", "V")) {
+            cout << "Incorrectly identified adjacent vertex \"V\" as unreachable from \"R\"" << endl;
+        }
+        if(!G->reachable("X", "W")) {
+            cout << "Incorrectly identified \"W\" as unreachable from \"X\"" << endl;
+        }
+        if(G->reachable("S", "A")) {
+            cout << "Incorrectly identified non-existant vetex \"A\" as reachable from \"S\"" << endl;
+        }
+    } catch(exception& e) {
+        cerr << "Error testing reachable : " << e.what() << endl;
+    }
+}
 int main()
 {
 	vector<int> data{0, 1, 2, 3, 4, 5};
@@ -86,7 +100,7 @@ int main()
 	cout << *graph2 << endl;
 
   test_bfs(graph2);
-
+	test_reachable(graph2);
 	delete graph2;
 
     	return 0;
