@@ -190,19 +190,17 @@ class Graph
 
 		bool reachable(K u, K v)
 		{
-			K s = this->getSource();
-			Graph <D,K> * copy = this;
-			copy->bfs(u);
-			Vertex <D,K> * endVert = copy->get(v);
-			this->setSource(s);
-			if(endVert == NULL)
+			
+			this.bfs(u);
+			this.get(v);
+			if(v == NULL)
 			{ //if the vertex with key v is not in the bfs tree of u return false
 				return false;
 			}
 			else
 			{
 				
-				int finDist = endVert->distance;
+				int finDist = v->distance;
 				
 				if(finDist == INT_MAX)
 				{
@@ -214,6 +212,8 @@ class Graph
 			}
 			
 		}
+	
+	
 		
 		void setSource(K k){
 			source = k;
