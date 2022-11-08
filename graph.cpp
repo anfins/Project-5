@@ -145,7 +145,38 @@ class Graph
 				current->color = 1;
 			}
 		}
-		
+		void dfs(){
+			
+			time = 0;
+			for(int i = 0; i < num_of_vertices; i++){
+				vertices[i]->color = 0;
+				vertices[i]->predecessor = NULL;
+			}
+			for(int i = 0; i < num_of_vertices ; i++){
+				if(i == false){
+					dfs_visit(u);
+				}
+		}
+
+
+		}
+		void dfs_visit(u){
+			time = time + 1;
+			Vertex<D,K> V  * get(u);
+			dis_time = time;
+			color = true;
+			for(int p = 0; p < V->num_of_edges; p++){
+				if( V*adj_list[p] == false){
+					V.adj[p]*predecessor = V;
+					dfs_visit(V.adj[p]);
+
+				} 
+			time = time + 1;
+			fin_time = time;
+		}
+	
+	
+	
 		/*void bfs_tree(K s)
 		{
 			K original_source = this->source;
