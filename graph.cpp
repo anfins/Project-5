@@ -13,13 +13,7 @@ using namespace std;
 // Graph template class
 template <typename D, typename K>
 class Graph
-{
-	private:
-		Vertex<D, K>* *vertices;	// array of vertex pointers
-		int num_of_vertices;	// size of array
-		K source;	// key of source vertex for bfs
-		int time;
-		
+{	
     	public:
         	Graph(vector<K> keys, vector<D> data, vector< vector<K> > edges)	// constructor for given keys, data, and adjacency lists of vertices
         	{
@@ -245,27 +239,6 @@ class Graph
 			time = time + 1;
 			v->fin_time = time;	// mark finish time
 		};
-
-		/*void bfs_tree(K s)
-		{
-			K original_source = this->source;
-			
-			this->bfs(s);
-			Vertex<D, K>* source = this->get(s);
-			
-			cout << source->key << endl;
-			
-			for (int i = 0; i < num_of_vertices; i++)
-			{
-				if()
-			
-			}
-			
-			cout << endl;
-		
-		
-			this->bfs(original_source);
-		}*/
 		
         	/*
         	print_path function.
@@ -351,8 +324,8 @@ class Graph
 		to_string function.
 		
 		Purpose:
-		Print the keys, data, and adjacency lists of all
-		vertices in a graph.
+		Prints all attributes of
+		a graph.
 		*/
 		string to_string() const
 		{
@@ -384,6 +357,10 @@ class Graph
 		};
 		
 	private:
+		Vertex<D, K>* *vertices;	// array of vertex pointers
+		int num_of_vertices;	// size of array
+		K source;	// key of source vertex for bfs
+		int time;
 		
 		/*
 		print_adjacency_lists function.
