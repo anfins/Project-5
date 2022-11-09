@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <queue>
 #include "graph.cpp"
 
@@ -46,6 +47,75 @@ Graph<string, string>* generate_graph(string fname)
 
 	return G;
 }
+
+void test_get(Graph<string,string>* G) 
+{
+	// example tests
+    	try 
+    	{
+		if (G->get("S") == nullptr || G->get("S")->data != "S data") 
+		{
+		    	cout << "Incorrect result getting vertex \"s\"" << endl; 
+		}
+		
+		if (G->get("a") != nullptr) 
+		{
+			cout << "Incorrect result getting non-existant vertex \"a\"" << endl;
+		}
+    	} 
+    	catch (exception& e) 
+    	{
+        	cerr << "Error getting vertex from graph : " << e.what() << endl;
+    	}
+    	
+    	// our tests
+	vector<int> data{0, 1, 2, 3, 4, 5};
+	vector<char> keys{'A', 'B', 'C', 'D', 'E', 'F'};
+
+	vector<char> adj1{'B', 'D'};
+	vector<char> adj2{'A', 'C'};
+	vector<char> adj3{'B', 'D'};
+	vector<char> adj4{'A', 'C', 'E'};
+	vector<char> adj5{'D', 'F'};
+	vector<char> adj6;
+	vector< vector<char> > edges = {adj1, adj2, adj3, adj4, adj5, adj6};
+
+	Graph<int, char> graph1 = Graph<int, char>(keys, data, edges);
+	
+	assert(graph1.get('B')->get_data() == 1);
+	assert(graph1.get('F')->get_data() == 5);
+	assert(graph1.get('A')->get_key() == 'A');
+	assert(graph1.get('c') == NULL);
+	assert(graph1.get('C') != NULL);
+	assert((graph1.get('C')->get_data() * 2 )== graph1.get('E')->get_data());
+}
+
+void test_reachable(Graph<string,string>* G) 
+{
+	// example tests
+    	try 
+    	{
+		if (!G->reachable("R", "V")) 
+		{
+		    	cout << "Incorrectly identified adjacent vertex \"V\" as unreachable from \"R\"" << endl;
+		}
+		
+		if (!G->reachable("X", "W")) 
+		{
+		    	cout << "Incorrectly identified \"W\" as unreachable from \"X\"" << endl;
+		}
+		
+		if (G->reachable("S", "A")) 
+		{
+		    	cout << "Incorrectly identified non-existant vetex \"A\" as reachable from \"S\"" << endl;
+		}
+    	} 
+    	catch (exception& e) 
+    	{
+        	cerr << "Error testing reachable : " << e.what() << endl;
+    	}
+}
+
 void test_bfs(Graph<string,string>* G) 
 {
 	// example tests
@@ -64,31 +134,39 @@ void test_bfs(Graph<string,string>* G)
             		}
         	}
     	} 
-    	catch(exception& e) 
+    	catch (exception& e) 
     	{
     		cerr << "Error testing bfs : " << e.what() << endl;
     	}
    	
 }
-/*
-void test_reachable(Graph<string,string>* G) {
-    try {
-        if(!G->reachable("R", "V")) {
-            cout << "Incorrectly identified adjacent vertex \"V\" as unreachable from \"R\"" << endl;
-        }
-        if(!G->reachable("X", "W")) {
-            cout << "Incorrectly identified \"W\" as unreachable from \"X\"" << endl;
-        }
-        if(G->reachable("S", "A")) {
-            cout << "Incorrectly identified non-existant vetex \"A\" as reachable from \"S\"" << endl;
-        }
-    } catch(exception& e) {
-        cerr << "Error testing reachable : " << e.what() << endl;
-    }
-}*/
+
+void test_print_path(Graph<string,string>* G) 
+{
+    	try 
+    	{
+		stringstream buffer;
+		
+		streambuf* prevbuf = cout.rdbuf(buffer.rdbuf());
+		
+		G->print_path("T", "V");
+		
+		cout.rdbuf(prevbuf);
+		
+		if (buffer.str()!="T -> S -> R -> V") 
+		{
+		    	cout << "Incorrect path from vertex \"T\" to vertex \"V\". Expected: T -> S -> R -> V but got : " << buffer.str() << endl;
+		}
+    	} 
+    	catch (exception& e) 
+    	{
+        	cerr << "Error testing print path : " << e.what() << endl;
+    	}
+}
 
 int main()
 {
+	/*
 	vector<int> data{0, 1, 2, 3, 4, 5};
 	vector<char> keys{'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -101,23 +179,19 @@ int main()
 	vector< vector<char> > edges = {adj1, adj2, adj3, adj4, adj5, adj6};
 
 	Graph<int, char> graph1 = Graph<int, char>(keys, data, edges);
-
-	cout << "GRAPH 1:" << endl;
-	cout << graph1 << endl << endl;
-
-	graph1.print_path('c', 'd');
-	cout << endl;
-
-	/*
-	// using "graph_description.txt"
-	Graph<string,string>* graph2 = generate_graph("graph_description.txt");
-
-	cout << "EXAMPLE GRAPH ADJACENCY LISTS:" << endl;
-
-  	test_bfs(graph2);
-	//test_reachable(graph2);
-	delete graph2;
 	*/
+	
+	string file = "graph_description.txt";
+	Graph<string,string>* graph2 = generate_graph(file);
+
+	test_get(graph2);
+	test_reachable(graph2);
+  	test_bfs(graph2);
+	test_print_path(graph2);
+	
+	delete graph2;
+	
+	cout << "All tests passed successfully" << endl;
 
     	return 0;
 }

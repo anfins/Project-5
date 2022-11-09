@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <bits/stdc++.h>
-#include <vector>
+#include <set>
 
 using namespace std;
 
@@ -31,8 +31,8 @@ class Vertex
             		color = false;
             		distance = INT_MAX;
             		predecessor = NULL;
-            		dis_time = INT_MAX;
-            		fin_time = INT_MAX;
+            		dis_time = 0;
+            		fin_time = 0;
             
 		    	if (adj_list_size <= 0)	// check if adjacency list is the right size
 		    	{
@@ -45,4 +45,51 @@ class Vertex
 				num_of_edges = adj_list_size;
 			}
         	}
+        	
+        	K get_key() const
+        	{
+        		return key;
+        	};
+        	
+        	D get_data() const
+        	{
+        		return data;
+        	};
+		
+		bool get_color() const
+        	{
+        		return color;
+        	};
+        	
+        	int get_distance() const
+        	{
+        		return distance;
+        	};
+        	
+        	K get_predecessor() const
+        	{
+        		return predecessor->key;
+        	};
+        	
+        	int get_dis_time()
+        	{
+        		return dis_time;
+        	};
+        	
+        	int get_fin_time()
+        	{
+        		return fin_time;
+        	};
+        	
+        	set<K>* get_edges()	const
+        	{
+        		set<K> e;
+        		
+        		for (int i = 0; i < num_of_edges; i++)
+        			e.insert(adj_list[i]->key);
+        		
+			set<K>* edges = &e;
+			
+        		return edges;
+        	};
 };

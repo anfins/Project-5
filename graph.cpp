@@ -241,6 +241,36 @@ class Graph
 		};
 		
         	/*
+        	reachable function.
+
+        	Purpose:
+        	Determines whether a vertex can be
+        	discovered from another vertex.
+
+        	Parameters:
+        	- u: a source vertex key.
+        	- v: a key for the vertex to find.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph that has been breadth-first searched
+        	from Vertex u.
+        	*/
+		bool reachable(K u, K v)
+		{
+			this->bfs(u);
+			Vertex<D, K>* find = this->get(v);
+
+			//if the vertex with key v is not in the bfs tree of u, or if distance is infinity, return false
+			if (find == NULL || find->distance == INT_MAX)
+				return false;
+				
+			return true;
+		};
+		
+        	/*
         	print_path function.
 
         	Purpose:
@@ -270,7 +300,7 @@ class Graph
         	print_path_recursive function.
 
         	Purpose:
-        	Recursive call for print_path.
+        	Recursive function for print_path.
         	*/
 		void print_path_recursive(K u, K v)
 		{
@@ -288,36 +318,6 @@ class Graph
 				this->print_path_recursive(source->key, find->predecessor->key);
 				cout << " -> " << find->key;
 			}
-		};
-
-        	/*
-        	reachable function.
-
-        	Purpose:
-        	Determines whether a vertex can be
-        	discovered from another vertex.
-
-        	Parameters:
-        	- u: a source vertex key.
-        	- v: a key for the vertex to find.
-
-        	Pre-conditions:
-        	- A graph.
-
-        	Post-conditions:
-        	- A graph that has been breadth-first searched
-        	from Vertex u.
-        	*/
-		bool reachable(K u, K v)
-		{
-			this->bfs(u);
-			Vertex<D, K>* find = this->get(v);
-
-			//if the vertex with key v is not in the bfs tree of u, or if distance is infinity, return false
-			if (find == NULL || find->distance == INT_MAX)
-				return false;
-				
-			return true;
 		};
 		
 		/*
@@ -359,8 +359,8 @@ class Graph
 	private:
 		Vertex<D, K>* *vertices;	// array of vertex pointers
 		int num_of_vertices;	// size of array
-		K source;	// key of source vertex for bfs
-		int time;
+		K source;	// key of source vertex for latest bfs/dfs
+		int time;	// global time variable (for dfs)
 		
 		/*
 		print_adjacency_lists function.
