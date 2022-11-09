@@ -290,44 +290,29 @@ class Graph
 		{
 			this->bfs(u);	// breadth-first search from u
 			
-			Vertex<D, K>* start = this->get(u);
-			Vertex<D, K>* end = this->get(v);
-			
-			if (start == NULL || end == NULL)	// if either do not exist, no path is valid
+			this->print_path_recursive(u, v);	// recursive functiion for print_path
+		};
+		
+        	/*
+        	print_path_recursive function.
+
+        	Purpose:
+        	Recursive call for print_path.
+        	*/
+		void print_path_recursive(K u, K v)
+		{
+			Vertex<D, K>* source = this->get(u);
+			Vertex<D, K>* find = this->get(v);
+
+			if (find == source)
+				cout << source->key;
+			else if (source == NULL || find == NULL || find->predecessor == NULL)
+				cout << "No path exists." << endl;
+			else
 			{
-				cerr << "No path exists, one or more input keys are invalid." << endl;
-				return;
+				this->print_path_recursive(u, find->predecessor->key);
+				cout << " -> " << find->key;
 			}
-			
-			stack<K> s;
-			
-			// work your way backwards--begin at the end vertex and travel to the 
-			// start, pushing each key along the way into a LIFO stack.
-			// This while loop will end when we reach the start or we find that we cannot reach the start.
-			while(end != start)
-			{
-				if (end == NULL)	// if the vertex pointer becomes null, we cannot reach vertex u
-				{
-					cout << "No path exists between Vertex " << u << " and Vertex " << v << endl;
-					return;
-				}
-					
-				s.push(end->key);
-					
-				end = end->predecessor;
-			}
-			
-			cout << start->key;
-	
-			// the last item inserted into the stack was the key before the start, we can 
-			// continually pop to get the full path from u to v.
-			while (!s.empty())
-			{
-				cout << " -> " << s.top();
-				s.pop();
-			}
-				
-			cout << endl;
 		};
 
         	/*

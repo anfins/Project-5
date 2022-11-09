@@ -97,7 +97,7 @@ int main()
 	vector<char> adj3{'B', 'D'};
 	vector<char> adj4{'A', 'C', 'E'};
 	vector<char> adj5{'D', 'F'};
-	vector<char> adj6{'E'};
+	vector<char> adj6;
 	vector< vector<char> > edges = {adj1, adj2, adj3, adj4, adj5, adj6};
 
 	Graph<int, char> graph1 = Graph<int, char>(keys, data, edges);
@@ -106,6 +106,7 @@ int main()
 	cout << graph1 << endl << endl;
 
 	graph1.print_path('A', 'F');
+	cout << endl;
 
 	/*
 	// using "graph_description.txt"
