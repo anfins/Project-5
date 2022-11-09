@@ -303,14 +303,16 @@ class Graph
 		{
 			Vertex<D, K>* source = this->get(u);
 			Vertex<D, K>* find = this->get(v);
-
-			if (find == source)
+			
+			if (source == NULL || find == NULL)	// if find or source are null, path does not exist
+				cout << "No path exists.";
+			else if (find == source)		// if find = source, print source (path has been found)
 				cout << source->key;
-			else if (source == NULL || find == NULL || find->predecessor == NULL)
-				cout << "No path exists." << endl;
-			else
+			else if (find->predecessor == NULL)	// if find's predecessor is null, no path exists
+				cout << "No path exists.";
+			else					// if find is an actual vertex and has a predecessor, then print its predecessor
 			{
-				this->print_path_recursive(u, find->predecessor->key);
+				this->print_path_recursive(source->key, find->predecessor->key);
 				cout << " -> " << find->key;
 			}
 		};

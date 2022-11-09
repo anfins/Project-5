@@ -105,7 +105,7 @@ int main()
 	cout << "GRAPH 1:" << endl;
 	cout << graph1 << endl << endl;
 
-	graph1.print_path('A', 'F');
+	graph1.print_path('c', 'd');
 	cout << endl;
 
 	/*
