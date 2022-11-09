@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include "graph.cpp"
 
-#include <queue>
 using namespace std;
 
 Graph<string, string>* generate_graph(string fname)
@@ -46,20 +46,31 @@ Graph<string, string>* generate_graph(string fname)
 
 	return G;
 }
-void test_bfs(Graph<string,string>* G) {
-    try {
-        G->bfs("T");
-        string vertices[8] = {"V", "R", "S", "W", "T", "X", "U", "Y"};
-        int distances[8] = {3,2,1,1,0,2,1,2};
-        for(int i = 0; i < 8; i++){
-            if(G->get(vertices[i])==nullptr || G->get(vertices[i])->distance!=distances[i]) {
-                cout << "Incorrect bfs result. Vertex " << vertices[i] << " should have distance " << distances[i] << " from source vertex \"t\"" << endl;
-            }
-        }
-    } catch(exception& e) {
-        cerr << "Error testing bfs : " << e.what() << endl;
-    }
+void test_bfs(Graph<string,string>* G) 
+{
+	// example tests
+	try 
+    	{
+        	G->bfs("T");
+        	
+        	string vertices[8] = {"V", "R", "S", "W", "T", "X", "U", "Y"};
+        	int distances[8] = {3,2,1,1,0,2,1,2};
+        	
+        	for (int i = 0; i < 8; i++)
+        	{
+            		if (G->get(vertices[i])==nullptr || G->get(vertices[i])->distance!=distances[i]) 
+            		{
+                		cout << "Incorrect bfs result. Vertex " << vertices[i] << " should have distance " << distances[i] << " from source vertex \"t\"" << endl;
+            		}
+        	}
+    	} 
+    	catch(exception& e) 
+    	{
+    		cerr << "Error testing bfs : " << e.what() << endl;
+    	}
+   	
 }
+/*
 void test_reachable(Graph<string,string>* G) {
     try {
         if(!G->reachable("R", "V")) {
@@ -74,34 +85,38 @@ void test_reachable(Graph<string,string>* G) {
     } catch(exception& e) {
         cerr << "Error testing reachable : " << e.what() << endl;
     }
-}
+}*/
+
 int main()
 {
 	vector<int> data{0, 1, 2, 3, 4, 5};
 	vector<char> keys{'A', 'B', 'C', 'D', 'E', 'F'};
 
-	vector<char> adj1{'B', 'C'};
-	vector<char> adj2{'A', 'D'};
-	vector<char> adj3{'A', 'D'};
-	vector<char> adj4{'B', 'C', 'E'};
-	vector<char> adj5{'D'};
-	vector<char> adj6;
+	vector<char> adj1{'B', 'D'};
+	vector<char> adj2{'A', 'C'};
+	vector<char> adj3{'B', 'D'};
+	vector<char> adj4{'A', 'C', 'E'};
+	vector<char> adj5{'D', 'F'};
+	vector<char> adj6{'E'};
 	vector< vector<char> > edges = {adj1, adj2, adj3, adj4, adj5, adj6};
 
 	Graph<int, char> graph1 = Graph<int, char>(keys, data, edges);
 
-	cout << "GRAPH 1 ADJACENCY LISTS:" << endl;
+	cout << "GRAPH 1:" << endl;
 	cout << graph1 << endl << endl;
 
+	graph1.print_path('A', 'F');
+
+	/*
 	// using "graph_description.txt"
 	Graph<string,string>* graph2 = generate_graph("graph_description.txt");
 
 	cout << "EXAMPLE GRAPH ADJACENCY LISTS:" << endl;
-	cout << *graph2 << endl;
 
-  test_bfs(graph2);
-	test_reachable(graph2);
+  	test_bfs(graph2);
+	//test_reachable(graph2);
 	delete graph2;
+	*/
 
     	return 0;
 }

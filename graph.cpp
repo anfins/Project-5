@@ -1,11 +1,12 @@
 // graph.cpp
 
 #include <iostream>
+#include <bits/stdc++.h>
 #include <sstream>
 #include <vector>
-#include "vertex.cpp"
-#include <bits/stdc++.h>
 #include <queue>
+#include <stack>
+#include "vertex.cpp"
 
 using namespace std;
 
@@ -13,6 +14,12 @@ using namespace std;
 template <typename D, typename K>
 class Graph
 {
+	private:
+		Vertex<D, K>* *vertices;	// array of vertex pointers
+		int num_of_vertices;	// size of array
+		K source;	// key of source vertex for bfs
+		int time;
+		
     	public:
         	Graph(vector<K> keys, vector<D> data, vector< vector<K> > edges)	// constructor for given keys, data, and adjacency lists of vertices
         	{
@@ -92,7 +99,23 @@ class Graph
 			return NULL;	// if no match, return NULL
 		};
 
+        	/*
+        	bfs (Breadth-First Search) function.
 
+        	Purpose:
+        	Search for every discoverable
+        	vertex from a given source vertex.
+        	
+        	Parameters:
+        	- s: a source vertex key.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A trees of the graph's vertexes, with
+        	Vertex s as its root.
+        	*/
 		void bfs(K s)
 		{
 			//initializing every vertex in the graph to their default values
@@ -144,39 +167,85 @@ class Graph
 				
 				current->color = 1;
 			}
-		}
-		void dfs(){
+		};
+		
+        	/*
+        	dfs (Depth-First Search) function.
+
+        	Purpose:
+        	Search for every vertex, beginning at 
+        	the furthest depth.
+        	
+        	Parameters:
+        	- N/A.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A forest of trees of the graph's vertexes.
+        	*/
+		void dfs()
+		{
+			time = 0;	// global time variable
 			
-			time = 0;
-			for(int i = 0; i < num_of_vertices; i++){
+			// initialize every vertex's attributes
+			for (int i = 0; i < num_of_vertices; i++)
+			{
 				vertices[i]->color = 0;
 				vertices[i]->predecessor = NULL;
 			}
-			for(int i = 0; i < num_of_vertices ; i++){
-				if(i == false){
-					dfs_visit(u);
+			
+			// for every vertex of the graph, visit if white (undiscovered)
+			for(int i = 0; i < num_of_vertices ; i++)
+			{
+				if(vertices[i]->color == false)
+				{
+					this->dfs_visit(vertices[i]->key);
 				}
-		}
+			}
+		};
+		
+        	/*
+        	dfs_visit function.
 
+        	Purpose:tin
+        	Visit the vertices of a vertex's adjacency
+        	list and mark the discovery and finish time.
+        	
+        	Parameters:
+        	-u: a vertex key.
 
-		}
-		void dfs_visit(u){
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph whose vertices from Vertex u to some other
+        	vertex have been discovered.
+        	*/
+		void dfs_visit(K u)
+		{
 			time = time + 1;
-			Vertex<D,K> V  * get(u);
-			dis_time = time;
-			color = true;
-			for(int p = 0; p < V->num_of_edges; p++){
-				if( V*adj_list[p] == false){
-					V.adj[p]*predecessor = V;
-					dfs_visit(V.adj[p]);
-
+			
+			Vertex<D,K>* v = this->get(u);
+			
+			v->dis_time = time;	// mark discovery time
+			v->color = true;
+			
+			// for every vertex in u's adjacency list, if that vertex is white, make u it's predecessor and visit it's adjacency lists recursively
+			for(int p = 0; p < v->num_of_edges; p++)
+			{
+				if( v->adj_list[p]->color == false)
+				{
+					v->adj_list[p]->predecessor = v;
+					this->dfs_visit(v->adj_list[p]->key);
 				} 
+			}
+		
 			time = time + 1;
-			fin_time = time;
-		}
-	
-	
-	
+			v->fin_time = time;	// mark finish time
+		};
+
 		/*void bfs_tree(K s)
 		{
 			K original_source = this->source;
@@ -198,63 +267,98 @@ class Graph
 			this->bfs(original_source);
 		}*/
 		
-			/*
-			Vertex<D, K>* source = this->get(u);
-			Vertex<D, K>* find = this->get(v);
+        	/*
+        	print_path function.
+
+        	Purpose:
+        	Prints the path from one vertex
+        	to another in a graph. Prints no 
+        	path if no such path exists.
+        	
+        	Parameters:
+        	- u: a start vertex key.
+        	- v: an end vertex key.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph that has been breadth-first searched
+        	from Vertex u.
+        	*/
+		void print_path(K u, K v)
+		{
+			this->bfs(u);	// breadth-first search from u
 			
-			if (source == NULL || find == NULL)
+			Vertex<D, K>* start = this->get(u);
+			Vertex<D, K>* end = this->get(v);
+			
+			if (start == NULL || end == NULL)	// if either do not exist, no path is valid
 			{
 				cerr << "No path exists, one or more input keys are invalid." << endl;
 				return;
 			}
 			
-			if (source->key == find->key)
-				cout << source->key;
-			else if (find->predecessor == NULL)
-				cout << "No path exists.";
-			else
+			stack<K> s;
+			
+			// work your way backwards--begin at the end vertex and travel to the 
+			// start, pushing each key along the way into a LIFO stack.
+			// This while loop will end when we reach the start or we find that we cannot reach the start.
+			while(end != start)
 			{
-				this->print_path(source->key, find->predecessor->key);
-				cout << " -> " << find->key;
+				if (end == NULL)	// if the vertex pointer becomes null, we cannot reach vertex u
+				{
+					cout << "No path exists between Vertex " << u << " and Vertex " << v << endl;
+					return;
+				}
+					
+				s.push(end->key);
+					
+				end = end->predecessor;
 			}
-			*/
+			
+			cout << start->key;
+	
+			// the last item inserted into the stack was the key before the start, we can 
+			// continually pop to get the full path from u to v.
+			while (!s.empty())
+			{
+				cout << " -> " << s.top();
+				s.pop();
+			}
+				
+			cout << endl;
+		};
 
+        	/*
+        	reachable function.
+
+        	Purpose:
+        	Determines whether a vertex can be
+        	discovered from another vertex.
+
+        	Parameters:
+        	- u: a source vertex key.
+        	- v: a key for the vertex to find.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph that has been breadth-first searched
+        	from Vertex u.
+        	*/
 		bool reachable(K u, K v)
 		{
-			
-			this.bfs(u);
-			this.get(v);
-			if(v == NULL)
-			{ //if the vertex with key v is not in the bfs tree of u return false
-				return false;
-			}
-			else
-			{
-				
-				int finDist = v->distance;
-				
-				if(finDist == INT_MAX)
-				{
-					return false;
-				}
-				
+			this->bfs(u);
+			Vertex<D, K>* find = this->get(v);
 
-				return true;
-			}
-			
-		}
-	
-	
-		
-		void setSource(K k){
-			source = k;
-		
-		
-		}
-		
-		K getSource(){
-			return source;
-		}
+			//if the vertex with key v is not in the bfs tree of u, or if distance is infinity, return false
+			if (find == NULL || find->distance == INT_MAX)
+				return false;
+				
+			return true;
+		};
 		
 		/*
 		to_string function.
@@ -293,9 +397,6 @@ class Graph
 		};
 		
 	private:
-		Vertex<D, K>* *vertices;	// array of vertex pointers
-		int num_of_vertices;	// size of array
-		K source;	// key of source vertex for bfs
 		
 		/*
 		print_adjacency_lists function.
@@ -332,10 +433,6 @@ class Graph
 			
 			return ss.str();
 		};
-		
-		
-		
-		
 		
 		/*
 		print_vertex_attributes function.
