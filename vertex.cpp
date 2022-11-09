@@ -80,16 +80,4 @@ class Vertex
         	{
         		return fin_time;
         	};
-        	
-        	set<K>* get_edges()	const
-        	{
-        		set<K> e;
-        		
-        		for (int i = 0; i < num_of_edges; i++)
-        			e.insert(adj_list[i]->key);
-        		
-			set<K>* edges = &e;
-			
-        		return edges;
-        	};
 };
