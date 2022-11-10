@@ -320,6 +320,57 @@ class Graph
 			}
 		};
 		
+
+		
+		
+		void bfs_tree(K s)
+		{
+			this->bfs(s);
+		
+			
+		};
+		
+		
+		string edge_class(K u, K k){
+		
+			string edgeType = "";
+			
+			this->dfs();
+			bool found =false;
+			Vertex <D,K> * a = this->get(u);
+			Vertex <D,K> * b = this->get(k);
+			
+			for(int i = 0; i<a->num_of_edges; i++){
+				if(a->adj_list[i] == b){
+					found = true;
+				}
+			}
+			if(found == true){
+				if(b->predecessor == a){
+					edgeType == "tree-edge";
+				}
+				if(found == true && b->fin_time < a->fin_time){
+					edgeType = "forward-edge";
+				}
+				if (found == true && ((a->fin_time < b->fin_time) && (a->dis_time > b->dis_time)))
+					edgeType = "back-edge";
+				if (found == true && a )
+			
+			
+			
+			}
+			
+			
+			
+			
+			
+			
+			
+		
+		
+		
+		}
+		
 		/*
 		to_string function.
 		
