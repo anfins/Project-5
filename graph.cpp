@@ -1,11 +1,16 @@
-// graph.cpp
+/* graph.cpp
+
+Programmers: Jorden Anfinson, Eduardo Jara, Jamaal Wairegi
+Course: CS 271 01: Data Structures
+Professor: Prof. Stacey Truex
+Date: 11.11.22
+*/
 
 #include <iostream>
 #include <bits/stdc++.h>
 #include <sstream>
 #include <vector>
 #include <queue>
-#include <stack>
 #include "vertex.cpp"
 
 using namespace std;
@@ -118,8 +123,12 @@ class Graph
 					vertices[i]->color = 0;
 					vertices[i]->predecessor = NULL;
 					vertices[i]->distance =INT_MAX; //change to infinity later on
-
+					
+					// change discovery and finish time to signify bfs took place
+					vertices[i]->dis_time = 0;
+					vertices[i]->fin_time = 0;
 			}
+			
 			Vertex <D,K> * source = this->get(s);
 			
 			if(source == NULL)	// incase the requested key is not in the graph
@@ -181,6 +190,7 @@ class Graph
         	*/
 		void dfs()
 		{
+			source = K();
 			time = 0;	// global time variable
 			
 			// initialize every vertex's attributes
@@ -188,6 +198,8 @@ class Graph
 			{
 				vertices[i]->color = 0;
 				vertices[i]->predecessor = NULL;
+				
+				vertices[i]->distance = INT_MAX;
 			}
 			
 			// for every vertex of the graph, visit if white (undiscovered)
@@ -320,62 +332,87 @@ class Graph
 			}
 		};
 		
+        	/*
+        	bfs_tree function.
 
-		
-		
+        	Purpose:
+        	Prints the contents of a bredth-first searched
+        	graph as a tree.
+        	
+        	Parameters:
+        	- s: a source vertex key.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph that has been breadth-first searched
+        	from source s.
+        	*/
 		void bfs_tree(K s)
 		{
-			this->bfs(s);
-		
-			
+			this->bfs(s);	
 		};
 		
 		
-		string edge_class(K u, K k){
-		
-			string edgeType = "";
-			
+        	/*
+        	edge_class function.
+
+        	Purpose:
+        	Identifies the type of edge two given vertices possess.
+        	Returns a string of the type of ege.
+        	
+        	Parameters:
+        	- u: a vertex key for which an edge begins.
+        	- v: another vertex key for which the edge ends.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph that has been depth-first searched.
+        	*/
+		string edge_class(K u, K v)
+		{
 			this->dfs();
-			bool found =false;
-			Vertex <D,K> * a = this->get(u);
-			Vertex <D,K> * b = this->get(k);
 			
-			for(int i = 0; i<a->num_of_edges; i++){
-				if(a->adj_list[i] == b){
-					found = true;
+			Vertex <D,K>* v1 = this->get(u);
+			Vertex <D,K>* v2 = this->get(v);
+			
+			if (v1 == NULL || v2 == NULL)	// no edge (either u or v does not exist)
+				return "no edge";
+				
+			bool edge_exists = false;
+			
+			for (int i = 0; i < v1->num_of_edges; i++)	// check if v2 is in v1's adjacency list (edge exists)
+			{					
+				if (v1->adj_list[i] == v2)
+				{
+					edge_exists = true;
+					break;
 				}
 			}
-			if(found == true){
-				if(b->predecessor == a){
-					edgeType == "tree-edge";
-				}
-				if(found == true && b->fin_time < a->fin_time){
-					edgeType = "forward-edge";
-				}
-				if (found == true && ((a->fin_time < b->fin_time) && (a->dis_time > b->dis_time)))
-					edgeType = "back-edge";
-				if (found == true && a )
-			
-			
-			
+
+			if(edge_exists)
+			{
+				if (v2->predecessor == v1)	// tree edge (v is discovered via u)
+					return "tree edge";
+				else if ((v2->dis_time > v1->dis_time) && (v2->fin_time < v1->fin_time))	// forward edge (v is descendant of u)
+					return "forward edge";
+				else if (((v1->dis_time > v2->dis_time) && (v1->fin_time < v2->fin_time)) || (v1 == v2))	// back edge (u is descendant of v OR (u, v) is a self edge)
+					return "back edge";
+				else				// cross edge (any other type of edge--connects non-descendants)
+					return "cross edge";
 			}
 			
-			
-			
-			
-			
-			
-			
-		
-		
-		
-		}
+			return "no edge";	// no edge (u and v exist, but (u, v) is not an edge)
+		};
 		
 		/*
 		to_string function.
 		
 		Purpose:
-		Prints all attributes of
+		Prints all vertices of
 		a graph.
 		*/
 		string to_string() const
@@ -402,7 +439,7 @@ class Graph
 			
 			ss << this->print_vertex_attributes() << endl;
 			
-			ss << "~~~~~~~~~~";
+			ss << "~~~~~~~~~~" << endl;
 			
 			return ss.str();
 		};
@@ -410,7 +447,7 @@ class Graph
 	private:
 		Vertex<D, K>* *vertices;	// array of vertex pointers
 		int num_of_vertices;	// size of array
-		K source;	// key of source vertex for latest bfs/dfs
+		K source;	// key of source vertex (for latest bfs)
 		int time;	// global time variable (for dfs)
 		
 		/*
@@ -427,6 +464,7 @@ class Graph
 			for (int i = 0; i < num_of_vertices; i++)
 			{		 
 				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
+				
 				if (vertices[i]->num_of_edges > 0)
 				{
 					for (int j = 0; j < ((vertices[i]->num_of_edges) - 1); j++)
@@ -462,6 +500,7 @@ class Graph
 				
 			for (int i = 0; i < num_of_vertices; i++)
 			{
+				// beginning bracket
 				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
 				
 				// color
@@ -477,12 +516,33 @@ class Graph
 					ss << "π = " << vertices[i]->predecessor->key << ", ";
 					
 				// distance
-				if(vertices[i]->distance == INT_MAX)
-					ss << "distance = ∞";
+				if (source != K())
+				{
+					if (vertices[i]->distance == INT_MAX)
+						ss << "distance = ∞, ";
+					else
+						ss << "distance = " << vertices[i]->distance << ", ";
+				}
 				else
-					ss << "distance = " << vertices[i]->distance;
+				{
+					ss << "distance = N/A, ";
+				}
 					
-				// end of a vertex
+				// discovery and finish time
+				if (source == K())
+				{
+					ss << "discovery = " << vertices[i]->dis_time << ", ";
+					
+					ss << "finish = " << vertices[i]->fin_time;
+				}
+				else
+				{
+					ss << "discovery = N/A, ";
+					
+					ss << "finish = N/A";
+				}
+					
+				// end bracket
 				if (i != (num_of_vertices - 1))
 					ss << "}" << endl;
 				else
