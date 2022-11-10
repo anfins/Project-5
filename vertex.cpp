@@ -8,6 +8,7 @@ Date: 11.11.22
 
 #include <iostream>
 #include <bits/stdc++.h>
+#include <sstream>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ class Vertex
 		Vertex* *adj_list;	// array of pointers to adjacent vertexes
 		int num_of_edges;	// size of array
 
-        	Vertex(K k, D d, int adj_list_size = 0)	// constructor for given data, key, and adjacency list (size)
+        	Vertex(K k, D d, int adj_list_size = 0)	// constructor for given data, key, and adjacency list size
         	{
             		data = d;
             		key = k;
@@ -99,5 +100,19 @@ class Vertex
         	int get_fin_time()
         	{
         		return fin_time;
+        	};
+        	
+        	// get_edges
+        	// Returns string of all keys of edges vertex has, separated by spaces
+        	string get_edges()
+        	{
+    			stringstream ss;
+    			
+        		for (int i = 0; i < num_of_edges - 1; i++)
+        			ss << adj_list[i]->key << " ";
+        			
+        		ss << adj_list[num_of_edges - 1]->key;
+        		
+        		return ss.str();
         	};
 };

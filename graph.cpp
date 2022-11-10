@@ -28,6 +28,7 @@ class Graph
         		{
         			cerr << "ERROR: Insufficient input." << endl;
         			num_of_vertices = 0;
+        			vertices = new Vertex<D,K>*[num_of_vertices];
         			return;
         		}
 
@@ -117,6 +118,9 @@ class Graph
         	*/
 		void bfs(K s)
 		{
+			if (num_of_vertices <= 0)
+				return;
+			
 			//initializing every vertex in the graph to their default values
 			for(int i = 0; i < num_of_vertices; i++)
 			{ 
@@ -173,86 +177,6 @@ class Graph
 		};
 		
         	/*
-        	dfs (Depth-First Search) function.
-
-        	Purpose:
-        	Search for every vertex, beginning at 
-        	the furthest depth.
-        	
-        	Parameters:
-        	- N/A.
-
-        	Pre-conditions:
-        	- A graph.
-
-        	Post-conditions:
-        	- A forest of trees of the graph's vertexes.
-        	*/
-		void dfs()
-		{
-			source = K();
-			time = 0;	// global time variable
-			
-			// initialize every vertex's attributes
-			for (int i = 0; i < num_of_vertices; i++)
-			{
-				vertices[i]->color = 0;
-				vertices[i]->predecessor = NULL;
-				
-				vertices[i]->distance = INT_MAX;
-			}
-			
-			// for every vertex of the graph, visit if white (undiscovered)
-			for(int i = 0; i < num_of_vertices ; i++)
-			{
-				if(vertices[i]->color == false)
-				{
-					this->dfs_visit(vertices[i]->key);
-				}
-			}
-		};
-		
-        	/*
-        	dfs_visit function.
-
-        	Purpose:tin
-        	Visit the vertices of a vertex's adjacency
-        	list and mark the discovery and finish time.
-        	
-        	Parameters:
-        	-u: a vertex key.
-
-        	Pre-conditions:
-        	- A graph.
-
-        	Post-conditions:
-        	- A graph whose vertices from Vertex u to some other
-        	vertex have been discovered.
-        	*/
-		void dfs_visit(K u)
-		{
-			time = time + 1;
-			
-			Vertex<D,K>* v = this->get(u);
-			
-			v->dis_time = time;	// mark discovery time
-			v->color = true;
-			
-			// for every vertex in u's adjacency list, if that vertex is white, make u it's predecessor and visit it's adjacency lists recursively
-			for(int p = 0; p < v->num_of_edges; p++)
-			{
-				if( v->adj_list[p]->color == false)
-				{
-					v->adj_list[p]->predecessor = v;
-					this->dfs_visit(v->adj_list[p]->key);
-				} 
-			}
-		
-			time = time + 1;
-			v->fin_time = time;	// mark finish time
-		};
-		
-        	/*
         	reachable function.
 
         	Purpose:
@@ -303,33 +227,12 @@ class Graph
         	*/
 		void print_path(K u, K v)
 		{
+			if (num_of_vertices <= 0)
+				return;
+				
 			this->bfs(u);	// breadth-first search from u
 			
 			this->print_path_recursive(u, v);	// recursive functiion for print_path
-		};
-		
-        	/*
-        	print_path_recursive function.
-
-        	Purpose:
-        	Recursive function for print_path.
-        	*/
-		void print_path_recursive(K u, K v)
-		{
-			Vertex<D, K>* source = this->get(u);
-			Vertex<D, K>* find = this->get(v);
-			
-			if (source == NULL || find == NULL)	// if find or source are null, path does not exist
-				cout << "No path exists.";
-			else if (find == source)		// if find = source, print source (path has been found)
-				cout << source->key;
-			else if (find->predecessor == NULL)	// if find's predecessor is null, no path exists
-				cout << "No path exists.";
-			else					// if find is an actual vertex and has a predecessor, then print its predecessor
-			{
-				this->print_path_recursive(source->key, find->predecessor->key);
-				cout << " -> " << find->key;
-			}
 		};
 		
         	/*
@@ -351,6 +254,9 @@ class Graph
         	*/
 		void bfs_tree(K s)
 		{
+			if (num_of_vertices <= 0)
+				return;
+			
 			this->bfs(s);	
 		};
 		
@@ -449,6 +355,113 @@ class Graph
 		int num_of_vertices;	// size of array
 		K source;	// key of source vertex (for latest bfs)
 		int time;	// global time variable (for dfs)
+
+        	/*
+        	dfs (Depth-First Search) function.
+
+        	Purpose:
+        	Search for every vertex, beginning at 
+        	the furthest depth.
+        	
+        	Parameters:
+        	- N/A.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A forest of trees of the graph's vertexes.
+        	*/
+		void dfs()
+		{
+			if (num_of_vertices <= 0)
+				return;
+			
+			source = K();
+			time = 0;	// global time variable
+			
+			// initialize every vertex's attributes
+			for (int i = 0; i < num_of_vertices; i++)
+			{
+				vertices[i]->color = 0;
+				vertices[i]->predecessor = NULL;
+				
+				vertices[i]->distance = INT_MAX;
+			}
+			
+			// for every vertex of the graph, visit if white (undiscovered)
+			for(int i = 0; i < num_of_vertices ; i++)
+			{
+				if(vertices[i]->color == false)
+				{
+					this->dfs_visit(vertices[i]->key);
+				}
+			}
+		};
+		
+        	/*
+        	dfs_visit function.
+
+        	Purpose:tin
+        	Visit the vertices of a vertex's adjacency
+        	list and mark the discovery and finish time.
+        	
+        	Parameters:
+        	-u: a vertex key.
+
+        	Pre-conditions:
+        	- A graph.
+
+        	Post-conditions:
+        	- A graph whose vertices from Vertex u to some other
+        	vertex have been discovered.
+        	*/
+		void dfs_visit(K u)
+		{
+			time = time + 1;
+			
+			Vertex<D,K>* v = this->get(u);
+			
+			v->dis_time = time;	// mark discovery time
+			v->color = true;
+			
+			// for every vertex in u's adjacency list, if that vertex is white, make u it's predecessor and visit it's adjacency lists recursively
+			for(int p = 0; p < v->num_of_edges; p++)
+			{
+				if( v->adj_list[p]->color == false)
+				{
+					v->adj_list[p]->predecessor = v;
+					this->dfs_visit(v->adj_list[p]->key);
+				} 
+			}
+		
+			time = time + 1;
+			v->fin_time = time;	// mark finish time
+		};
+		
+        	/*
+        	print_path_recursive function.
+
+        	Purpose:
+        	Recursive function for print_path.
+        	*/
+		void print_path_recursive(K u, K v)
+		{
+			Vertex<D, K>* source = this->get(u);
+			Vertex<D, K>* find = this->get(v);
+			
+			if (source == NULL || find == NULL)	// if find or source are null, path does not exist
+				cout << "No path exists.";
+			else if (find == source)		// if find = source, print source (path has been found)
+				cout << source->key;
+			else if (find->predecessor == NULL)	// if find's predecessor is null, no path exists
+				cout << "No path exists.";
+			else					// if find is an actual vertex and has a predecessor, then print its predecessor
+			{
+				this->print_path_recursive(source->key, find->predecessor->key);
+				cout << " -> " << find->key;
+			}
+		};
 		
 		/*
 		print_adjacency_lists function.

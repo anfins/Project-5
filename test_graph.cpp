@@ -8,9 +8,9 @@ Date: 11.11.22
 
 #include <iostream>
 #include <bits/stdc++.h>
-#include <vector>
 #include <queue>
 #include "graph.cpp"
+#include <vector>
 
 using namespace std;
 
@@ -75,25 +75,34 @@ void test_get(Graph<string,string>* G)
     	}
     	
     	// our tests
-	vector<int> data{0, 1, 2, 3, 4, 5};
-	vector<char> keys{'A', 'B', 'C', 'D', 'E', 'F'};
+	vector<int> data1{0, 1, 2, 3, 4, 5};
+	vector<char> keys1{'A', 'B', 'C', 'D', 'E', 'F'};
 
-	vector<char> adj1{'B', 'D'};
-	vector<char> adj2{'A', 'C'};
-	vector<char> adj3{'B', 'D'};
-	vector<char> adj4{'A', 'C', 'E'};
-	vector<char> adj5{'D', 'F'};
-	vector<char> adj6;
-	vector< vector<char> > edges = {adj1, adj2, adj3, adj4, adj5, adj6};
+	vector<char> adj1_1{'B', 'D'};
+	vector<char> adj2_1{'A', 'C'};
+	vector<char> adj3_1{'B', 'D'};
+	vector<char> adj4_1{'A', 'C', 'E'};
+	vector<char> adj5_1{'D', 'F'};
+	vector<char> adj6_1;
+	vector< vector<char> > edges1 = {adj1_1, adj2_1, adj3_1, adj4_1, adj5_1, adj6_1};
 
-	Graph<int, char> graph = Graph<int, char>(keys, data, edges);
+	Graph<int, char> graph1 = Graph<int, char>(keys1, data1, edges1);
 	
-	assert(graph.get('B')->get_data() == 1);
-	assert(graph.get('F')->get_data() == 5);
-	assert(graph.get('A')->get_key() == 'A');
-	assert(graph.get('c') == NULL);
-	assert(graph.get('C') != NULL);
-	assert((graph.get('C')->get_data() * 2 )== graph.get('E')->get_data());
+	assert(graph1.get('B')->get_data() == 1);
+	assert(graph1.get('F')->get_data() == 5);
+	assert(graph1.get('A')->get_key() == 'A');
+	assert(graph1.get('c') == NULL);
+	assert(graph1.get('C') != NULL);
+	assert((graph1.get('C')->get_data() * 2 )== graph1.get('E')->get_data());
+	
+	vector<string> keys2{};
+	vector<int> data2{};
+	vector< vector<string> > edges2{};
+	
+	Graph<int, string> graph2 = Graph<int, string>(keys2, data2, edges2);
+	
+	assert(graph2.get("hello") == NULL);
+	assert(graph2.get("") == NULL);
 }
 
 void test_reachable(Graph<string,string>* G) 
@@ -234,6 +243,15 @@ void test_edge_class(Graph<string,string>* G)
 	assert(graph1.edge_class(3.1, 6.4) == "forward edge");
 	assert(graph1.edge_class(3.1, 3.1) == "back edge");	// self edge should still be back edge
 	
+	// also testing out that dfs works correctly
+	assert(graph1.get(3.1)->get_dis_time() == 1);
+	assert(graph1.get(3.1)->get_predecessor() == 0.0);	// no predecessor, key returned is default key value
+	assert(graph1.get(4.2)->get_dis_time() == 2);
+	assert(graph1.get(6.4)->get_dis_time() == 3);
+	assert(graph1.get(6.4)->get_predecessor() == graph1.get(4.2)->get_key());
+	assert(graph1.get(5.3)->get_fin_time() == 7);
+	
+	
 	vector<bool> data2{true, false, true, true, false};
 	vector<string> keys2{"We will get an A", "We will get an F", "We will get bonus points", "We will get free pizza", "The next exam will be easy"};
 
@@ -253,7 +271,28 @@ void test_edge_class(Graph<string,string>* G)
 	assert(graph2.edge_class("We will get free pizza", "The next exam will be easy") == "cross edge");	// would be a tree edge, but due to the ordering of the adj list, the vertex "The next exam will be easy"'s predecessor is the vertex "We will get bonus points", even though "We will get free pizza" also leads to "The next exam will be easy".
 	assert(graph2.edge_class("We will get bonus points", "The next exam will be easy") == "tree edge");
 	assert(graph2.edge_class("hello", "world") == "no edge");
+	
+	
+	vector<string> keys3{"cs271"};
+	vector<float> data3{3.00};
+	
+	vector<string> adj1_3{"cs271"};
+	vector< vector<string> > edges3{adj1_3};
+	
+	Graph<float, string> graph3 = Graph<float, string>(keys3, data3, edges3);
+	
+	assert(graph3.edge_class("cs271", "cs271") == "back edge");
+	assert(graph3.get("cs271")->get_dis_time() == 1);
+	assert(graph3.get("cs271")->get_fin_time() == 2);
+	assert(graph3.get("cs271")->get_predecessor() == "");	// no predecessor, key returned is default key value
 }
+
+void test_dfs(Graph<string,string>* G)
+{
+
+
+
+};
 
 /*
 void test_bfs_tree(Graph<string,string>* G) 
