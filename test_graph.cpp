@@ -341,7 +341,7 @@ void test_print_path(Graph<string,string>* G)
 	graph3.print_path(4, 10);
 	cout.rdbuf(prevbuf6);
 	
-	assert(buffer6.str() == "No path exists.");
+	assert(buffer6.str() == "No path exists.");	// empty graph will always output this
 }
 
 void test_edge_class(Graph<string,string>* G) 
@@ -451,7 +451,6 @@ void test_edge_class(Graph<string,string>* G)
 	assert(graph3.get("cs271")->get_predecessor() == "");	// no predecessor, key returned is default key value
 }
 
-/*
 void test_bfs_tree(Graph<string,string>* G) 
 {
     	try 
@@ -472,7 +471,6 @@ void test_bfs_tree(Graph<string,string>* G)
         	cerr << "Error testing bfs tree : " << e.what() << endl;
     	}
 }
-*/
 
 int main()
 {
@@ -484,7 +482,8 @@ int main()
   	test_bfs(graph);
 	test_print_path(graph);
 	test_edge_class(graph);
-	//test_bfs_tree(graph);
+	test_bfs_tree(graph);
+	cout << "pop" << endl;
 	
 	delete graph;
 	

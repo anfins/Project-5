@@ -21,7 +21,6 @@ template <typename D, typename K>
 class Graph
 {
     	public:
-          int maxdistance =0;
         	Graph(vector<K> keys, vector<D> data, vector< vector<K> > edges)	// constructor for given keys, data, and adjacency lists of vertices
         	{
         		// if an uneven amount of keys or data or edges are given, no
@@ -60,6 +59,7 @@ class Graph
 		    	}
 
 		    	source = K();
+		    	max_distance = 0;
         	};
 
 		~Graph()	// destructor
@@ -75,14 +75,18 @@ class Graph
 
         	/*
         	get function.
+        	
         	Purpose:
         	Find the vertex with a given key in a graph.
         	Returns a pointer to the vertex. Returns NULL
         	if key does not exist.
+        	
         	Parameters:
         	- k: a key.
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A graph.
         	*/
@@ -99,22 +103,33 @@ class Graph
 
         	/*
         	bfs (Breadth-First Search) function.
+        	
         	Purpose:
         	Search for every discoverable
         	vertex from a given source vertex.
 
         	Parameters:
         	- s: a source vertex key.
+        	- print: flag variable for printing the 
+        	tree associated with bfs'd graph (for bfs_tree
+        	function).
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A trees of the graph's vertexes, with
         	Vertex s as its root.
         	*/
-		void bfs(K s)
+		void bfs(K s, bool print = false)
 		{
 			if (num_of_vertices <= 0)
+			{
+				if (print)
+					cout << "";
+				
 				return;
+			}
 
 			//initializing every vertex in the graph to their default values
 			for(int i = 0; i < num_of_vertices; i++)
@@ -130,12 +145,23 @@ class Graph
 			Vertex <D,K> * source = this->get(s);
 
 			if(source == NULL)	// incase the requested key is not in the graph
+			{
+				if (print)
+					cout << "";
+				
 				return;
+			}
 
 			// initialize source attributes
 			source->color = 1;
 			source->predecessor = NULL;
 			source->distance = 0;
+			
+			max_distance = 0;
+			
+			// print at level 0
+			if (print)
+				cout << source->key << endl;
 
 			this->source = source->key;
 
@@ -145,31 +171,63 @@ class Graph
 			//while the queue is not empty there are still vertices that need to be checked
 			while(q.empty() != true)
 			{
-				Vertex <D,K> * current;
-				current = q.front(); //sets a placeholder vertex = to what is at the front of the queue for future reference
+				Vertex <D,K>* current;
+				current = q.front(); // sets a placeholder vertex = to what is at the front of the queue for future reference
 				q.pop();
-
+				
 				//will discover every undiscovered node from current's adjacency list and add them to the queue
 				for(int p = 0; p < current->num_of_edges; p++)
 				{
 					Vertex <D,K>* newVertex = current->adj_list[p];
 
-					if(newVertex->color == 0)
-					{
+					if (newVertex->color == 0)
+					{	
 						newVertex->predecessor = current;
+						
 						newVertex->distance = newVertex->predecessor->distance + 1;
+						max_distance = newVertex->distance;
+						
 						newVertex->color = 1;
+						
 						q.push(newVertex);
-            if(newVertex->distance > maxdistance){
-              maxdistance = newVertex->distance;
-            }
+						
+						// print at current level (only print the space if still at distance x and its not the final vertex at distance x)
+						if (print)
+							cout << newVertex->key << " ";
 					}
 				}
 
 				current->color = 1;
+				
+				// end of level (only print once all vertices at distance x have been printed)
+				if (print && !q.empty())
+					cout << endl;
 			}
 		};
 
+        	/*
+        	bfs_tree function.
+        	
+        	Purpose:
+        	Prints the contents of a bredth-first searched
+        	graph as a tree. Simply passes in 'true' for
+        	'print' in bfs function.
+
+        	Parameters:
+        	- s: a source vertex key.
+        	
+        	Pre-conditions:
+        	- A graph.
+        	
+        	Post-conditions:
+        	- A graph that has been breadth-first searched
+        	from source s.
+        	*/
+        	void bfs_tree(K s)
+        	{
+        		this->bfs(s, true);
+        	}
+	    
     void bfs_tree(K k ){
       this->bfs(k); 
       for(int i = 0; i <=maxdistance; i++){
@@ -187,14 +245,18 @@ class Graph
 
         	/*
         	reachable function.
+        	
         	Purpose:
         	Determines whether a vertex can be
         	discovered from another vertex.
+        	
         	Parameters:
         	- u: a source vertex key.
         	- v: a key for the vertex to find.
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A graph that has been breadth-first searched
         	from Vertex u.
@@ -202,7 +264,7 @@ class Graph
 		bool reachable(K u, K v)
 		{
 			this->bfs(u); //calls bfs to initialize the vertices in the graph from the source vertex u
-      //this will initialize all of the vertices in our graph, if a vertex is not reachable from the source vertex, its distance will still be INT_MAX after this call
+      			//this will initialize all of the vertices in our graph, if a vertex is not reachable from the source vertex, its distance will still be INT_MAX after this call
 
 			Vertex<D, K>* source = this->get(u); //creating a pointer to the source vertex
 
@@ -220,6 +282,7 @@ class Graph
 
         	/*
         	print_path function.
+        	
         	Purpose:
         	Prints the path from one vertex
         	to another in a graph. Prints no
@@ -228,8 +291,10 @@ class Graph
         	Parameters:
         	- u: a start vertex key.
         	- v: an end vertex key.
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A graph that has been breadth-first searched
         	from Vertex u.
@@ -248,73 +313,8 @@ class Graph
 		};
 
         	/*
-        	bfs_tree function.
-        	Purpose:
-        	Prints the contents of a bredth-first searched
-        	graph as a tree.
-
-        	Parameters:
-        	- s: a source vertex key.
-        	Pre-conditions:
-        	- A graph.
-        	Post-conditions:
-        	- A graph that has been breadth-first searched
-        	from source s.
-        	*/
-        	/*
-		void bfs_tree(K s)
-		{
-			if (num_of_vertices <= 0)
-			{
-				cout << "";
-				return;
-			}
-
-			this->bfs(s);
-
-			Vertex<D, K>* source = this->get(s);
-
-			if (source == NULL)
-				return;
-
-			set<K> tree_vertices;
-
-			cout << source->key << endl;
-
-			tree_vertices.insert(s);
-
-			int tree_vertices_size = tree_vertices.size();
-
-			int current_distance_check = 1;
-
-			while (tree_vertices_size < num_of_vertices)
-			{
-				for (int i = 0; i < num_of_vertices; i++)
-				{
-					if (vertices[i]->distance == current_distance_check)
-					{
-						cout << vertices[i]->key << " ";
-
-						if (vertices[i] != vertices[i]->predecessor->adj_list[vertices[i]->predecessor->num_of_edges - 1] || vertices[i]->predecessor->num_of_edges == 1)
-							cout << " ";
-
-						tree_vertices.insert(vertices[i]->key);
-					}
-					else if (vertices[i]->distance == INT_MAX)
-						tree_vertices.insert(vertices[i]->key);
-				}
-
-				tree_vertices_size = tree_vertices.size();
-				current_distance_check++;
-
-				if (tree_vertices_size < num_of_vertices)
-					cout << endl;
-			}
-		};
-		*/
-
-        	/*
         	edge_class function.
+        	
         	Purpose:
         	Identifies the type of edge two given vertices possess.
         	Returns a string of the type of ege.
@@ -322,8 +322,10 @@ class Graph
         	Parameters:
         	- u: a vertex key for which an edge begins.
         	- v: another vertex key for which the edge ends.
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A graph that has been depth-first searched.
         	*/
@@ -404,17 +406,21 @@ class Graph
 		int num_of_vertices;	// size of array
 		K source;	// key of source vertex (for latest bfs)
 		int time;	// global time variable (for dfs)
+		int max_distance;	//track max distance for bfs_tree function
 
         	/*
         	dfs (Depth-First Search) function.
+        	
         	Purpose:
         	Search for every vertex, beginning at
         	the furthest depth.
 
         	Parameters:
         	- N/A.
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A forest of trees of the graph's vertexes.
         	*/
@@ -447,14 +453,17 @@ class Graph
 
         	/*
         	dfs_visit function.
-        	Purpose:tin
+        	
+        	Purpose:
         	Visit the vertices of a vertex's adjacency
         	list and mark the discovery and finish time.
 
         	Parameters:
         	-u: a vertex key.
+        	
         	Pre-conditions:
         	- A graph.
+        	
         	Post-conditions:
         	- A graph whose vertices from Vertex u to some other
         	vertex have been discovered.
@@ -484,6 +493,7 @@ class Graph
 
         	/*
         	print_path_recursive function.
+        	
         	Purpose:
         	Recursive function for print_path.
         	*/
@@ -610,6 +620,7 @@ class Graph
 
 /*
 << operator.
+
 Purpose:
 Print graphs.
 */
