@@ -1,5 +1,5 @@
-/* graph.cpp
 
+/* graph.cpp
 Programmers: Jorden Anfinson, Eduardo Jara, Jamaal Wairegi
 Course: CS 271 01: Data Structures
 Professor: Prof. Stacey Truex
@@ -19,8 +19,9 @@ using namespace std;
 // Graph template class
 template <typename D, typename K>
 class Graph
-{	
+{
     	public:
+          int maxdistance =0;
         	Graph(vector<K> keys, vector<D> data, vector< vector<K> > edges)	// constructor for given keys, data, and adjacency lists of vertices
         	{
         		// if an uneven amount of keys or data or edges are given, no
@@ -57,7 +58,7 @@ class Graph
 		    			vertices[j]->adj_list[k] = adj_vertex;	// add it to adjacency list
 		    		}
 		    	}
-		    	
+
 		    	source = K();
         	};
 
@@ -74,18 +75,14 @@ class Graph
 
         	/*
         	get function.
-
         	Purpose:
         	Find the vertex with a given key in a graph.
         	Returns a pointer to the vertex. Returns NULL
         	if key does not exist.
-
         	Parameters:
         	- k: a key.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A graph.
         	*/
@@ -102,17 +99,14 @@ class Graph
 
         	/*
         	bfs (Breadth-First Search) function.
-
         	Purpose:
         	Search for every discoverable
         	vertex from a given source vertex.
-        	
+
         	Parameters:
         	- s: a source vertex key.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A trees of the graph's vertexes, with
         	Vertex s as its root.
@@ -121,86 +115,101 @@ class Graph
 		{
 			if (num_of_vertices <= 0)
 				return;
-			
+
 			//initializing every vertex in the graph to their default values
 			for(int i = 0; i < num_of_vertices; i++)
-			{ 
+			{
 					vertices[i]->color = 0;
 					vertices[i]->predecessor = NULL;
 					vertices[i]->distance =INT_MAX;
-					
+
 					vertices[i]->dis_time = 0;
 					vertices[i]->fin_time = 0;
 			}
-			
+
 			Vertex <D,K> * source = this->get(s);
-			
+
 			if(source == NULL)	// incase the requested key is not in the graph
 				return;
-			
+
 			// initialize source attributes
 			source->color = 1;
 			source->predecessor = NULL;
 			source->distance = 0;
-			
+
 			this->source = source->key;
 
 			queue <Vertex <D,K> *> q; //making a queue to store our Vertex pointers
 			q.push(source);
-			
+
 			//while the queue is not empty there are still vertices that need to be checked
 			while(q.empty() != true)
 			{
 				Vertex <D,K> * current;
 				current = q.front(); //sets a placeholder vertex = to what is at the front of the queue for future reference
 				q.pop();
-				
+
 				//will discover every undiscovered node from current's adjacency list and add them to the queue
 				for(int p = 0; p < current->num_of_edges; p++)
 				{
 					Vertex <D,K>* newVertex = current->adj_list[p];
-					
+
 					if(newVertex->color == 0)
 					{
 						newVertex->predecessor = current;
 						newVertex->distance = newVertex->predecessor->distance + 1;
 						newVertex->color = 1;
 						q.push(newVertex);
+            if(newVertex->distance > maxdistance){
+              maxdistance = newVertex->distance;
+            }
 					}
 				}
-				
+
 				current->color = 1;
 			}
 		};
-		
+
+    void bfs_tree(K k ){
+      this->bfs(k); 
+      for(int i = 0; i <=maxdistance; i++){
+        for(int k =0; k < num_of_vertices; k++){
+          if(vertices[k]->distance == i){
+
+            cout << vertices[k]->key << " ";
+
+          }
+
+        }
+        cout << endl;
+      }
+    }
+
         	/*
         	reachable function.
-
         	Purpose:
         	Determines whether a vertex can be
         	discovered from another vertex.
-
         	Parameters:
         	- u: a source vertex key.
         	- v: a key for the vertex to find.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A graph that has been breadth-first searched
         	from Vertex u.
         	*/
 		bool reachable(K u, K v)
 		{
-			this->bfs(u);
+			this->bfs(u); //calls bfs to initialize the vertices in the graph from the source vertex u
+      //this will initialize all of the vertices in our graph, if a vertex is not reachable from the source vertex, its distance will still be INT_MAX after this call
 
-			Vertex<D, K>* source = this->get(u);
+			Vertex<D, K>* source = this->get(u); //creating a pointer to the source vertex
 
 			if (source == NULL)
 				return false;
 
-			Vertex<D, K>* find = this->get(v);
+			Vertex<D, K>* find = this->get(v); //creating a pointer to the vertex we need to find
 
 			//if the vertex with key v is not in the bfs tree of u, or if distance is infinity, return false
 			if (find == NULL || find->distance == INT_MAX)
@@ -208,22 +217,19 @@ class Graph
 
 			return true;
 		};
-		
+
         	/*
         	print_path function.
-
         	Purpose:
         	Prints the path from one vertex
-        	to another in a graph. Prints no 
+        	to another in a graph. Prints no
         	path if no such path exists.
-        	
+
         	Parameters:
         	- u: a start vertex key.
         	- v: an end vertex key.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A graph that has been breadth-first searched
         	from Vertex u.
@@ -235,25 +241,22 @@ class Graph
 				cout << "No path exists.";
 				return;
 			}
-				
+
 			this->bfs(u);	// breadth-first search from u
-			
+
 			this->print_path_recursive(u, v);	// recursive functiion for print_path
 		};
-		
+
         	/*
         	bfs_tree function.
-
         	Purpose:
         	Prints the contents of a bredth-first searched
         	graph as a tree.
-        	
+
         	Parameters:
         	- s: a source vertex key.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A graph that has been breadth-first searched
         	from source s.
@@ -266,24 +269,24 @@ class Graph
 				cout << "";
 				return;
 			}
-			
-			this->bfs(s);	
-			
+
+			this->bfs(s);
+
 			Vertex<D, K>* source = this->get(s);
-			
+
 			if (source == NULL)
 				return;
-			
+
 			set<K> tree_vertices;
-			
+
 			cout << source->key << endl;
-			
+
 			tree_vertices.insert(s);
-			
+
 			int tree_vertices_size = tree_vertices.size();
-			
+
 			int current_distance_check = 1;
-	
+
 			while (tree_vertices_size < num_of_vertices)
 			{
 				for (int i = 0; i < num_of_vertices; i++)
@@ -291,56 +294,53 @@ class Graph
 					if (vertices[i]->distance == current_distance_check)
 					{
 						cout << vertices[i]->key << " ";
-						
+
 						if (vertices[i] != vertices[i]->predecessor->adj_list[vertices[i]->predecessor->num_of_edges - 1] || vertices[i]->predecessor->num_of_edges == 1)
 							cout << " ";
-					
+
 						tree_vertices.insert(vertices[i]->key);
 					}
 					else if (vertices[i]->distance == INT_MAX)
 						tree_vertices.insert(vertices[i]->key);
 				}
-				
+
 				tree_vertices_size = tree_vertices.size();
 				current_distance_check++;
-				
+
 				if (tree_vertices_size < num_of_vertices)
 					cout << endl;
 			}
 		};
-		*/	
-		
+		*/
+
         	/*
         	edge_class function.
-
         	Purpose:
         	Identifies the type of edge two given vertices possess.
         	Returns a string of the type of ege.
-        	
+
         	Parameters:
         	- u: a vertex key for which an edge begins.
         	- v: another vertex key for which the edge ends.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A graph that has been depth-first searched.
         	*/
 		string edge_class(K u, K v)
 		{
 			this->dfs();
-			
+
 			Vertex <D,K>* v1 = this->get(u);
 			Vertex <D,K>* v2 = this->get(v);
-			
+
 			if (v1 == NULL || v2 == NULL)	// no edge (either u or v does not exist)
 				return "no edge";
-				
+
 			bool edge_exists = false;
-			
+
 			for (int i = 0; i < v1->num_of_edges; i++)	// check if v2 is in v1's adjacency list (edge exists)
-			{					
+			{
 				if (v1->adj_list[i] == v2)
 				{
 					edge_exists = true;
@@ -352,20 +352,20 @@ class Graph
 			{
 				if (v2->predecessor == v1)	// tree edge (v is discovered via u)
 					return "tree edge";
-				else if ((v2->dis_time > v1->dis_time) && (v2->fin_time < v1->fin_time))	// forward edge (v is descendant of u)
+				else if ((v2->dis_time > v1->dis_time) && (v2->fin_time < v1->fin_time))	// forward edge (v is descendant of u) (v has completed )
 					return "forward edge";
 				else if (((v1->dis_time > v2->dis_time) && (v1->fin_time < v2->fin_time)) || (v1 == v2))	// back edge (u is descendant of v OR (u, v) is a self edge)
 					return "back edge";
 				else				// cross edge (any other type of edge--connects non-descendants)
 					return "cross edge";
 			}
-			
+
 			return "no edge";	// no edge (u and v exist, but (u, v) is not an edge)
 		};
-		
+
 		/*
 		to_string function.
-		
+
 		Purpose:
 		Prints all vertices of
 		a graph.
@@ -373,32 +373,32 @@ class Graph
 		string to_string() const
 		{
 			stringstream ss;
-			
+
 			if (num_of_vertices <= 0)
 				return ss.str();
-			
+
 			if (num_of_vertices <= 0)
 				return ss.str();
-				
+
 			ss << "~~~~~~~~~~" << endl;
-			
+
 			ss << "ADJACENCY LISTS: " << endl;
 			ss << this->print_adjacency_lists() << endl;
-			
+
 			ss << "~~~~~" << endl;
-			
+
 			if (source != K())
 				ss << "VERTEX ATTRIBUTES (source is Vertex " << source << "): " << endl;
 			else
 				ss << "VERTEX ATTRIBUTES (no source): " << endl;
-			
+
 			ss << this->print_vertex_attributes() << endl;
-			
+
 			ss << "~~~~~~~~~~" << endl;
-			
+
 			return ss.str();
 		};
-		
+
 	private:
 		Vertex<D, K>* *vertices;	// array of vertex pointers
 		int num_of_vertices;	// size of array
@@ -407,17 +407,14 @@ class Graph
 
         	/*
         	dfs (Depth-First Search) function.
-
         	Purpose:
-        	Search for every vertex, beginning at 
+        	Search for every vertex, beginning at
         	the furthest depth.
-        	
+
         	Parameters:
         	- N/A.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A forest of trees of the graph's vertexes.
         	*/
@@ -425,19 +422,19 @@ class Graph
 		{
 			if (num_of_vertices <= 0)
 				return;
-			
+
 			source = K();
 			time = 0;	// global time variable
-			
+
 			// initialize every vertex's attributes
 			for (int i = 0; i < num_of_vertices; i++)
 			{
 				vertices[i]->color = 0;
 				vertices[i]->predecessor = NULL;
-				
+
 				vertices[i]->distance = INT_MAX;
 			}
-			
+
 			// for every vertex of the graph, visit if white (undiscovered)
 			for(int i = 0; i < num_of_vertices ; i++)
 			{
@@ -447,20 +444,17 @@ class Graph
 				}
 			}
 		};
-		
+
         	/*
         	dfs_visit function.
-
         	Purpose:tin
         	Visit the vertices of a vertex's adjacency
         	list and mark the discovery and finish time.
-        	
+
         	Parameters:
         	-u: a vertex key.
-
         	Pre-conditions:
         	- A graph.
-
         	Post-conditions:
         	- A graph whose vertices from Vertex u to some other
         	vertex have been discovered.
@@ -468,12 +462,12 @@ class Graph
 		void dfs_visit(K u)
 		{
 			time = time + 1;
-			
+
 			Vertex<D,K>* v = this->get(u);
-			
+
 			v->dis_time = time;	// mark discovery time
 			v->color = true;
-			
+
 			// for every vertex in u's adjacency list, if that vertex is white, make u it's predecessor and visit it's adjacency lists recursively
 			for(int p = 0; p < v->num_of_edges; p++)
 			{
@@ -481,16 +475,15 @@ class Graph
 				{
 					v->adj_list[p]->predecessor = v;
 					this->dfs_visit(v->adj_list[p]->key);
-				} 
+				}
 			}
-		
+
 			time = time + 1;
 			v->fin_time = time;	// mark finish time
 		};
-		
+
         	/*
         	print_path_recursive function.
-
         	Purpose:
         	Recursive function for print_path.
         	*/
@@ -498,7 +491,7 @@ class Graph
 		{
 			Vertex<D, K>* source = this->get(u);
 			Vertex<D, K>* find = this->get(v);
-			
+
 			if (source == NULL || find == NULL)	// if find or source are null, path does not exist
 				cout << "No path exists.";
 			else if (find == source)		// if find = source, print source (path has been found)
@@ -511,10 +504,10 @@ class Graph
 				cout << " -> " << find->key;
 			}
 		};
-		
+
 		/*
 		print_adjacency_lists function.
-		
+
 		Purpose:
 		Print the adjacency lists of all
 		vertices in a graph.
@@ -522,61 +515,61 @@ class Graph
 		string print_adjacency_lists() const
 		{
 			stringstream ss;
-				
+
 			for (int i = 0; i < num_of_vertices; i++)
-			{		 
+			{
 				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
-				
+
 				if (vertices[i]->num_of_edges > 0)
 				{
 					for (int j = 0; j < ((vertices[i]->num_of_edges) - 1); j++)
 						ss << vertices[i]->adj_list[j]->key << ", ";
-						
+
 					ss << vertices[i]->adj_list[((vertices[i]->num_of_edges) - 1)]->key << "}";
-					
+
 					if (i != (num_of_vertices - 1))
 						ss << endl;
 				}
 				else
 				{
 					ss << "}";
-					
+
 					if (i != (num_of_vertices - 1))
 						ss << endl;
 				}
 			}
-			
+
 			return ss.str();
 		};
-		
+
 		/*
 		print_vertex_attributes function.
-		
+
 		Purpose:
-		Print the attributes of each vertex 
+		Print the attributes of each vertex
 		in a graph.
 		*/
 		string print_vertex_attributes() const
 		{
 			stringstream ss;
-				
+
 			for (int i = 0; i < num_of_vertices; i++)
 			{
 				// beginning bracket
 				ss << "Vertex " << vertices[i]->key << " (Data = " << vertices[i]->data << "): {";
-				
+
 				// color
 				if (vertices[i]->color)
 					ss << "color = Black, ";
 				else
 					ss << "color = White, ";
-					
+
 				// predecessor
 				if (vertices[i]->predecessor == NULL)
 					ss << "π = None, ";
 				else
 					ss << "π = " << vertices[i]->predecessor->key << ", ";
-					
+
 				// distance
 				if (source != K())
 				{
@@ -589,35 +582,34 @@ class Graph
 				{
 					ss << "distance = N/A, ";
 				}
-					
+
 				// discovery and finish time
 				if (source == K())
 				{
 					ss << "discovery = " << vertices[i]->dis_time << ", ";
-					
+
 					ss << "finish = " << vertices[i]->fin_time;
 				}
 				else
 				{
 					ss << "discovery = N/A, ";
-					
+
 					ss << "finish = N/A";
 				}
-					
+
 				// end bracket
 				if (i != (num_of_vertices - 1))
 					ss << "}" << endl;
 				else
 					ss << "}";
 			}
-			
+
 			return ss.str();
 		};
 };
 
 /*
 << operator.
-
 Purpose:
 Print graphs.
 */
