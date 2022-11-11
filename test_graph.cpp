@@ -3,14 +3,16 @@
 Programmers: Jorden Anfinson, Eduardo Jara, Jamaal Wairegi
 Course: CS 271 01: Data Structures
 Professor: Prof. Stacey Truex
-Date: 11.11.22
+Date: 11.11.2022
 */
 
 #include <iostream>
 #include <bits/stdc++.h>
+#include <fstream>
+#include <sstream>
+#include <vector>
 #include <queue>
 #include "graph.cpp"
-#include <vector>
 
 using namespace std;
 
@@ -97,6 +99,7 @@ void test_get(Graph<string,string>* G)
 	
 	vector<string> keys2{};
 	vector<int> data2{};
+	
 	vector< vector<string> > edges2{};
 	
 	Graph<int, string> graph2 = Graph<int, string>(keys2, data2, edges2);
@@ -129,6 +132,50 @@ void test_reachable(Graph<string,string>* G)
     	{
         	cerr << "Error testing reachable : " << e.what() << endl;
     	}
+    	
+    	// our tests
+    	vector<float> data1{3.141, 0.375, 0.500, 3.333, 0.001};
+	vector<int> keys1{40, 30, 20, 10, 0};
+
+	vector<int> adj1_1{30, 20};
+	vector<int> adj2_1{10};
+	vector<int> adj3_1{10};
+	vector<int> adj4_1{40};
+	vector<int> adj5_1{10};
+	vector< vector<int> > edges1 = {adj1_1, adj2_1, adj3_1, adj4_1, adj5_1};
+
+	Graph<float, int> graph1 = Graph<float, int>(keys1, data1, edges1);
+	
+	assert(graph1.reachable(40, 10));
+	assert(graph1.reachable(20, 20));
+	assert(graph1.reachable(30, 10));
+	assert(graph1.reachable(30, 40));
+	assert(!graph1.reachable(40, 0) == graph1.reachable(0, 40));
+	
+	
+    	vector<string> data2{"house", "ice", "jungle", "keep", "laundry", "mop"};
+	vector<char> keys2{'h', 'i', 'j', 'k', 'l', 'm'};
+
+	vector<char> adj1_2{'j'};
+	vector<char> adj2_2{'h', 'k'};
+	vector<char> adj3_2{'k'};
+	vector<char> adj4_2{'h'};
+	vector<char> adj5_2{'k'};
+	vector<char> adj6_2{};
+	vector< vector<char> > edges2 = {adj1_2, adj2_2, adj3_2, adj4_2, adj5_2, adj6_2};
+
+	Graph<string, char> graph2 = Graph<string, char>(keys2, data2, edges2);
+	
+	int num_vertices = keys2.size();
+	
+	// check that Vertex m is completely isolated
+	for (int i = 0; i < num_vertices - 1; i++)
+		assert(!graph2.reachable(graph2.get(keys2[i])->get_key(), 'm'));
+		
+	assert(graph2.reachable('l', 'j'));
+	assert(!graph2.reachable('j', 'i'));
+	assert(graph2.reachable('h', 'k'));
+	assert(!graph2.reachable('h', 'i'));
 }
 
 void test_bfs(Graph<string,string>* G) 
@@ -153,7 +200,52 @@ void test_bfs(Graph<string,string>* G)
     	{
     		cerr << "Error testing bfs : " << e.what() << endl;
     	}
-   	
+    	
+    	vector<bool> data1{false, false, false, true, true};
+	vector<long long> keys1{10000, 20000, 30000, 40000, 50000};
+
+	vector<long long> adj1_1{20000, 30000};
+	vector<long long> adj2_1{40000, 50000};
+	vector<long long> adj3_1{40000};
+	vector<long long> adj4_1{};
+	vector<long long> adj5_1{40000};
+	vector< vector<long long> > edges1 = {adj1_1, adj2_1, adj3_1, adj4_1, adj5_1};
+
+	Graph<bool, long long> graph1 = Graph<bool, long long>(keys1, data1, edges1);
+	
+	graph1.bfs(10000);
+	
+	// Vertex 10000 is the source
+	assert(((graph1.get(10000)->get_predecessor() == 0) == (graph1.get(10000)->get_color() == true)) == (graph1.get(10000)->get_distance() == 0));
+	
+	int num_vertices = keys1.size();
+	
+	// all vertices in graph 1 should be discoverable from 10000
+	for (int i = 0; i < num_vertices - 1; i++)
+		assert((graph1.get(keys1[i])->get_color() == true));
+		
+	assert(graph1.get(20000)->get_predecessor() == 10000);
+	assert(graph1.get(30000)->get_predecessor() == 10000);
+	assert(graph1.get(40000)->get_predecessor() == 20000);
+	assert(graph1.get(50000)->get_predecessor() == 20000);
+	assert(graph1.get(30000)->get_distance() == 1);
+	
+	graph1.bfs(40000);
+	
+	for (int i = 0; i < num_vertices; i++)
+	{
+		if (graph1.get(keys1[i])->get_key() != 40000)
+			assert((graph1.get(keys1[i])->get_color() == false));
+	}
+	
+	// Vertex 40000 is the source
+	assert(((graph1.get(40000)->get_predecessor() == 0) == (graph1.get(40000)->get_color() == true)) == (graph1.get(40000)->get_distance() == 0));
+	
+	graph1.bfs(50000);
+	
+	// only Vertex 40000 is reachable from 50000
+	assert(graph1.get(40000)->get_color() == true);
+	assert(graph1.get(40000)->get_distance() == 1);
 }
 
 void test_print_path(Graph<string,string>* G) 
@@ -178,6 +270,78 @@ void test_print_path(Graph<string,string>* G)
     	{
         	cerr << "Error testing print path : " << e.what() << endl;
     	}
+    	
+   	vector<short int> data1{2, 3, -5, 80};
+	vector<u_char> keys1{'!', '?', ';', '.'};
+
+	vector<u_char> adj1_1{'!', '?'};
+	vector<u_char> adj2_1{'.', ';'};
+	vector<u_char> adj3_1{'!'};
+	vector<u_char> adj4_1{};
+	vector< vector<u_char> > edges1 = {adj1_1, adj2_1, adj3_1, adj4_1};
+	
+	Graph<short int, u_char> graph1 = Graph<short int, u_char>(keys1, data1, edges1);
+
+	stringstream buffer1;
+	streambuf* prevbuf1 = cout.rdbuf(buffer1.rdbuf());
+	graph1.print_path('!', '!');
+	cout.rdbuf(prevbuf1);
+	
+	assert(buffer1.str() == "!");
+	
+	stringstream buffer2;
+	streambuf* prevbuf2 = cout.rdbuf(buffer2.rdbuf());
+	graph1.print_path('?', '!');
+	cout.rdbuf(prevbuf2);
+	
+	assert(buffer2.str() == "? -> ; -> !");
+	
+   	vector<double> data2{1.111, 2.222, 3.333, 4.444, 5.555, 6.666};
+	vector<double> keys2{10.2, 30.4, 50.6, 70.8, 90.1, 100.0};
+
+	vector<double> adj1_2{30.4};
+	vector<double> adj2_2{90.1};
+	vector<double> adj3_2{10.2, 70.8};
+	vector<double> adj4_2{100.0};
+	vector<double> adj5_2{};
+	vector<double> adj6_2{90.1};
+	vector< vector<double> > edges2 = {adj1_2, adj2_2, adj3_2, adj4_2, adj5_2, adj6_2};
+	
+	Graph<double, double> graph2 = Graph<double, double>(keys2, data2, edges2);
+	
+	stringstream buffer3;
+	streambuf* prevbuf3 = cout.rdbuf(buffer3.rdbuf());
+	graph2.print_path(10.2, 90.1);
+	cout.rdbuf(prevbuf3);
+	
+	assert(buffer3.str() == "10.2 -> 30.4 -> 90.1");
+	
+	stringstream buffer4;
+	streambuf* prevbuf4 = cout.rdbuf(buffer4.rdbuf());
+	graph2.print_path(50.6, 90.1);
+	cout.rdbuf(prevbuf4);
+	
+	assert(buffer4.str() == "50.6 -> 10.2 -> 30.4 -> 90.1"); // you can make it to 90.1 to 50.6 by going to 70.8 OR 10.2, but since 10.2 appears in 50.6's adj list first, that path is prioritizes (it is *a* shortest path) 
+	
+	stringstream buffer5;
+	streambuf* prevbuf5 = cout.rdbuf(buffer5.rdbuf());
+	graph2.print_path(90.1, 30.4);
+	cout.rdbuf(prevbuf5);
+	
+	assert(buffer5.str() == "No path exists.");
+	
+   	vector<int> data3{};
+	vector<int> keys3{};
+	vector< vector<int> > edges3{};
+	
+	Graph<int, int> graph3 = Graph<int, int>(keys3, data3, edges3);
+	
+	stringstream buffer6;
+	streambuf* prevbuf6 = cout.rdbuf(buffer6.rdbuf());
+	graph3.print_path(4, 10);
+	cout.rdbuf(prevbuf6);
+	
+	assert(buffer6.str() == "No path exists.");
 }
 
 void test_edge_class(Graph<string,string>* G) 
@@ -286,13 +450,6 @@ void test_edge_class(Graph<string,string>* G)
 	assert(graph3.get("cs271")->get_fin_time() == 2);
 	assert(graph3.get("cs271")->get_predecessor() == "");	// no predecessor, key returned is default key value
 }
-
-void test_dfs(Graph<string,string>* G)
-{
-
-
-
-};
 
 /*
 void test_bfs_tree(Graph<string,string>* G) 

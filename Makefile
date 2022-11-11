@@ -1,4 +1,16 @@
-# Makefile for Project 5
+##########################
+# Makefile for Project 5 # 
+#                        #
+# Jorden Anfinson        #
+# Eduardo Jara           #
+# Jamaal Wairegi         #
+#                        #
+# CS 271 01              #
+#                        #
+# Prof. Stacey Truex     #
+#                        #
+# 11.11.2022             #
+##########################
 
 CPPOPTIONS = -std=c++11 -g -Wall
 

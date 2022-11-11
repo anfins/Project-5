@@ -3,7 +3,7 @@
 Programmers: Jorden Anfinson, Eduardo Jara, Jamaal Wairegi
 Course: CS 271 01: Data Structures
 Professor: Prof. Stacey Truex
-Date: 11.11.22
+Date: 11.11.2022
 */
 
 #include <iostream>

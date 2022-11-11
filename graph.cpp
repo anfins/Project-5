@@ -3,7 +3,7 @@
 Programmers: Jorden Anfinson, Eduardo Jara, Jamaal Wairegi
 Course: CS 271 01: Data Structures
 Professor: Prof. Stacey Truex
-Date: 11.11.22
+Date: 11.11.2022
 */
 
 #include <iostream>
@@ -11,6 +11,7 @@ Date: 11.11.22
 #include <sstream>
 #include <vector>
 #include <queue>
+#include <set>
 #include "vertex.cpp"
 
 using namespace std;
@@ -126,9 +127,8 @@ class Graph
 			{ 
 					vertices[i]->color = 0;
 					vertices[i]->predecessor = NULL;
-					vertices[i]->distance =INT_MAX; //change to infinity later on
+					vertices[i]->distance =INT_MAX;
 					
-					// change discovery and finish time to signify bfs took place
 					vertices[i]->dis_time = 0;
 					vertices[i]->fin_time = 0;
 			}
@@ -136,9 +136,7 @@ class Graph
 			Vertex <D,K> * source = this->get(s);
 			
 			if(source == NULL)	// incase the requested key is not in the graph
-			{
 				return;
-			}
 			
 			// initialize source attributes
 			source->color = 1;
@@ -159,16 +157,15 @@ class Graph
 				
 				//will discover every undiscovered node from current's adjacency list and add them to the queue
 				for(int p = 0; p < current->num_of_edges; p++)
-				{ 
-
-
+				{
 					Vertex <D,K>* newVertex = current->adj_list[p];
 					
 					if(newVertex->color == 0)
 					{
-						q.push(newVertex);
 						newVertex->predecessor = current;
-						newVertex->distance = newVertex->predecessor->distance +1;
+						newVertex->distance = newVertex->predecessor->distance + 1;
+						newVertex->color = 1;
+						q.push(newVertex);
 					}
 				}
 				
@@ -197,12 +194,18 @@ class Graph
 		bool reachable(K u, K v)
 		{
 			this->bfs(u);
+
+			Vertex<D, K>* source = this->get(u);
+
+			if (source == NULL)
+				return false;
+
 			Vertex<D, K>* find = this->get(v);
 
 			//if the vertex with key v is not in the bfs tree of u, or if distance is infinity, return false
 			if (find == NULL || find->distance == INT_MAX)
 				return false;
-				
+
 			return true;
 		};
 		
@@ -228,7 +231,10 @@ class Graph
 		void print_path(K u, K v)
 		{
 			if (num_of_vertices <= 0)
+			{
+				cout << "No path exists.";
 				return;
+			}
 				
 			this->bfs(u);	// breadth-first search from u
 			
@@ -252,14 +258,57 @@ class Graph
         	- A graph that has been breadth-first searched
         	from source s.
         	*/
+        	/*
 		void bfs_tree(K s)
 		{
 			if (num_of_vertices <= 0)
+			{
+				cout << "";
 				return;
+			}
 			
 			this->bfs(s);	
+			
+			Vertex<D, K>* source = this->get(s);
+			
+			if (source == NULL)
+				return;
+			
+			set<K> tree_vertices;
+			
+			cout << source->key << endl;
+			
+			tree_vertices.insert(s);
+			
+			int tree_vertices_size = tree_vertices.size();
+			
+			int current_distance_check = 1;
+	
+			while (tree_vertices_size < num_of_vertices)
+			{
+				for (int i = 0; i < num_of_vertices; i++)
+				{
+					if (vertices[i]->distance == current_distance_check)
+					{
+						cout << vertices[i]->key << " ";
+						
+						if (vertices[i] != vertices[i]->predecessor->adj_list[vertices[i]->predecessor->num_of_edges - 1] || vertices[i]->predecessor->num_of_edges == 1)
+							cout << " ";
+					
+						tree_vertices.insert(vertices[i]->key);
+					}
+					else if (vertices[i]->distance == INT_MAX)
+						tree_vertices.insert(vertices[i]->key);
+				}
+				
+				tree_vertices_size = tree_vertices.size();
+				current_distance_check++;
+				
+				if (tree_vertices_size < num_of_vertices)
+					cout << endl;
+			}
 		};
-		
+		*/	
 		
         	/*
         	edge_class function.
